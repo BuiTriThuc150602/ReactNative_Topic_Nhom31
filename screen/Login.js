@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React from "react";
 
-const Login = () => {
+const Login = ({navigation}) => {
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -28,7 +28,7 @@ const Login = () => {
               <Text style={styles.links}>Forgot Password</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.btnLogin}>
+          <Pressable style={styles.btnLogin} onPress={()=>navigation.navigate("HomeTab")}>
             <Text style={styles.Login}>Sign In</Text>
           </Pressable>
         </View>
