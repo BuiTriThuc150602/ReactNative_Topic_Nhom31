@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet} from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -19,7 +19,7 @@ const HomeTab = () => {
             iconName = focused
               ? "newspaper"
               : "newspaper-outline";
-          } else if (route.name === "Info") {
+          } else if (route.name === "User") {
             iconName = focused ? "information-circle" : "information-circle-outline";
           }else{
             iconName = focused ? "trending-up" : "trending-up-outline";
@@ -37,7 +37,7 @@ const HomeTab = () => {
         options={{ headerShown: false }}
       />
       <Tab.Screen name="Trending" component={Trending} />
-      <Tab.Screen name="Info" component={Info} />
+      <Tab.Screen name="User" component={Info} />
     </Tab.Navigator>
   );
 };

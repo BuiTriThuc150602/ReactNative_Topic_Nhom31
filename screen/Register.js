@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React from "react";
 
-const Login = ({navigation}) => {
+const Register = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -18,32 +18,49 @@ const Login = ({navigation}) => {
         resizeMode="cover"
       >
         <View style={styles.formContainer}>
+          <TextInput placeholder="User Name" style={styles.input} />
+          <TextInput placeholder="Date Of Birth" style={styles.input} />
           <TextInput placeholder="Email" style={styles.input} />
           <TextInput placeholder="Password" style={styles.input} />
+          <TextInput placeholder="Confirm Password" style={styles.input} />
+
           <View style={styles.linksRow}>
-            <Pressable onPress={()=>navigation.navigate("SignUp")}>
-              <Text style={styles.links}>Sign Up</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.links}>Forgot Password</Text>
+            <Pressable onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.links}>Have an account ? Sign now</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.btnLogin} onPress={()=>navigation.navigate("HomeTab")}>
+
+          <Pressable
+            style={styles.btnLogin}
+            onPress={() => navigation.navigate("Login")}
+          >
             <Text style={styles.Login}>Sign In</Text>
           </Pressable>
         </View>
         <Text style={{ color: "white", marginTop: 50 }}>Sign in with</Text>
         <View style={styles.moreLogin}>
-          <Image source={require("../img/gg-logo.png")} resizeMode="contain" style={styles.logo_icons} />
-          <Image source={require("../img/fb-logo.png")}  resizeMode="contain" style={styles.logo_icons}/>
-          <Image source={require("../img/phone-logo.png")} resizeMode="contain" style={styles.logo_icons} />
+          <Image
+            source={require("../img/gg-logo.png")}
+            resizeMode="contain"
+            style={styles.logo_icons}
+          />
+          <Image
+            source={require("../img/fb-logo.png")}
+            resizeMode="contain"
+            style={styles.logo_icons}
+          />
+          <Image
+            source={require("../img/phone-logo.png")}
+            resizeMode="contain"
+            style={styles.logo_icons}
+          />
         </View>
       </ImageBackground>
     </View>
   );
 };
 
-export default Login;
+export default Register;
 
 const styles = StyleSheet.create({
   container: {
@@ -55,27 +72,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   formContainer: {
+    marginTop: 50,
     width: "90%",
     backgroundColor: "none",
   },
   input: {
     backgroundColor: "none",
-    marginBottom: 20,
-    paddingVertical: 15,
+    marginBottom: 10,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "white",
     color: "white",
   },
   links: {
-    color: "red",
+    color: "white",
     marginBottom: 20,
-    fontWeight: "100",
-    borderBottomWidth: 1,
-    borderBottomColor: "red",
+    fontWeight: "300",
+    borderWidth: 1,
+    borderColor: "green",
+    padding: 10,
+    borderRadius: 10,
+    fontStyle: "italic",
   },
   linksRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
   },
   btnLogin: {
     backgroundColor: "#54D933",
@@ -92,12 +113,11 @@ const styles = StyleSheet.create({
   },
   moreLogin: {
     flexDirection: "row",
-    marginTop: 80
+    marginTop: 80,
   },
   logo_icons: {
     width: 60,
     height: 60,
     marginHorizontal: 10,
   },
-
 });
