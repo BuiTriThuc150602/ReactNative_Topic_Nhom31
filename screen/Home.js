@@ -9,14 +9,16 @@ import {
   Text,
   View,
   TextInput,
-
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import SwiperFlatList from "react-native-swiper-flatlist";
 
 const Home = ({ navigation }) => {
   const [result, setResult] = useState(null);
-  const [search, setSearch] = useState("");
+  const searchRef = useRef(""); 
+  const [searchPressed, setSearchPressed] = useState(false);
+  const [searchResult, setSearchResult] = useState(null);
+
   navigation.setOptions({
     headerTitle: "Tin Tức",
     headerStyle: {
@@ -45,6 +47,25 @@ const Home = ({ navigation }) => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const handleSearch = async () => {
+      if (searchRef.current.trim() === "") {
+        setSearchResult(null);
+      } else {
+        const filteredResult = result?.articles.filter((item) =>
+          item.title.toLowerCase().includes(searchRef.current.toLowerCase())
+        );
+        setSearchResult(filteredResult);
+      }
+    };
+
+    if (searchPressed) {
+      handleSearch();
+      setSearchPressed(false);
+    }
+  }, [result, searchPressed]);
+
   const renderItem = ({ item }) => {
     return (
       <View style={styles.container}>
@@ -73,9 +94,14 @@ const Home = ({ navigation }) => {
     return `${day}/${month}/${year}`;
   }
 
-  const images = result?.articles
+  const images = searchResult
+    ? searchResult
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3)
+        .map((item) => item.urlToImage)
+    : result?.articles
     ? result.articles
-        .sort(() => Math.random() - 0.5) 
+        .sort(() => Math.random() - 0.5)
         .slice(0, 3)
         .map((item) => item.urlToImage)
     : [];
@@ -83,9 +109,10 @@ const Home = ({ navigation }) => {
   const handlePressImage = (index) => {
     console.log(`Image at index ${index} pressed.`);
   };
-  const handleSearch = async () => {
-    console.log(search);
-  }
+
+  const handleSearch = () => {
+    setSearchPressed(true);
+  };
 
   return (
     <View style={styles.container}>
@@ -94,8 +121,7 @@ const Home = ({ navigation }) => {
           <TextInput
             style={styles.searchInput}
             placeholder="Tìm kiếm"
-            onChangeText={(text) => setSearch(text)}
-            value={search}
+            onChangeText={(text) => (searchRef.current = text)}
           />
           <Pressable style={styles.searchButton} onPress={handleSearch}>
             <Text style={styles.searchButtonText}>Tìm</Text>
@@ -125,7 +151,10 @@ const Home = ({ navigation }) => {
             )}
           />
         </View>
-        <FlatList data={result?.articles || []} renderItem={renderItem} />
+        <FlatList
+          data={searchResult || result?.articles || []}
+          renderItem={renderItem}
+        />
       </ScrollView>
     </View>
   );
@@ -220,5 +249,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "gray",
   },
-
 });
