@@ -6,6 +6,8 @@ import {
   TextInput,
   ImageBackground,
   Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React from "react";
 
@@ -17,12 +19,16 @@ const Register = ({ navigation }) => {
         style={styles.background}
         resizeMode="cover"
       >
-        <View style={styles.formContainer}>
-          <TextInput placeholder="User Name" style={styles.input} />
-          <TextInput placeholder="Date Of Birth" style={styles.input} />
-          <TextInput placeholder="Email" style={styles.input} />
-          <TextInput placeholder="Password" style={styles.input} />
-          <TextInput placeholder="Confirm Password" style={styles.input} />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={100}
+          style={styles.formContainer}
+        >
+          <TextInput placeholder="User Name" placeholderTextColor={"white"} style={styles.input} />
+          <TextInput placeholder="Date Of Birth" placeholderTextColor={"white"} style={styles.input} />
+          <TextInput placeholder="Email"  placeholderTextColor={"white"} style={styles.input} />
+          <TextInput placeholder="Password" placeholderTextColor={"white"} style={styles.input} />
+          <TextInput placeholder="Confirm Password" placeholderTextColor={"white"} style={styles.input} />
 
           <View style={styles.linksRow}>
             <Pressable onPress={() => navigation.navigate("Login")}>
@@ -36,8 +42,7 @@ const Register = ({ navigation }) => {
           >
             <Text style={styles.Login}>Sign In</Text>
           </Pressable>
-        </View>
-        <Text style={{ color: "white", marginTop: 50 }}>Sign in with</Text>
+        <Text style={{ color: "white", marginTop: 50 , textAlign: 'center'}}>Sign in with</Text>
         <View style={styles.moreLogin}>
           <Image
             source={require("../img/gg-logo.png")}
@@ -55,6 +60,8 @@ const Register = ({ navigation }) => {
             style={styles.logo_icons}
           />
         </View>
+        </KeyboardAvoidingView>
+
       </ImageBackground>
     </View>
   );
@@ -65,6 +72,8 @@ export default Register;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: "relative",
+    paddingBottom: 0
   },
   background: {
     flex: 1,
@@ -77,12 +86,11 @@ const styles = StyleSheet.create({
     backgroundColor: "none",
   },
   input: {
-    backgroundColor: "none",
     marginBottom: 10,
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "white",
-    color: "white",
+    color: Platform.OS === "web" ? "white" : "white",
   },
   links: {
     color: "white",
@@ -113,6 +121,7 @@ const styles = StyleSheet.create({
   },
   moreLogin: {
     flexDirection: "row",
+    justifyContent: "center",
     marginTop: 80,
   },
   logo_icons: {

@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Feather, MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 const Info = ({ navigation, route }) => {
@@ -7,24 +7,32 @@ const Info = ({ navigation, route }) => {
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev);
   };
-  navigation.setOptions({
-    headerTitle: "Thông tin cá nhân",
-    headerStyle: {
-      backgroundColor: "skyblue",
-      shadowColor: "#fff",
-    },
-    headerTintColor: "#fff",
-    headerTitleStyle: {
-      fontWeight: "bold",
-      fontSize: 20,
-    },
-    headerRight: () => (
-      <Pressable style={styles.btnLogout}>
-        <MaterialIcons name="logout" size={20} color="red" />
-        <Text style={styles.txtLogout}>Đăng Xuất</Text>
-      </Pressable>
-    ),
-  });
+
+  const logout = () => {
+    navigation.navigate("Login");
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Thông tin cá nhân",
+      headerStyle: {
+        backgroundColor: "skyblue",
+        shadowColor: "#fff",
+      },
+      headerTintColor: "#fff",
+      headerTitleStyle: {
+        fontWeight: "bold",
+        fontSize: 20,
+      },
+      headerRight: () => (
+        <Pressable style={styles.btnLogout} onPress={logout}>
+          <MaterialIcons name="logout" size={20} color="red" />
+          <Text style={styles.txtLogout}>Đăng Xuất</Text>
+        </Pressable>
+      ),
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <Ionicons name="person-circle-outline" size={150} color="grey" />

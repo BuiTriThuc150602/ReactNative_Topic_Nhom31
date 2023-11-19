@@ -34,7 +34,6 @@ const HomeTab = () => {
       <Tab.Screen
         name="News"
         component={Home}
-        options={{ headerShown: false }}
       />
       <Tab.Screen name="Trending" component={Trending} />
       <Tab.Screen name="User" component={Info} />
@@ -44,4 +43,3 @@ const HomeTab = () => {
 
 export default HomeTab;
 
-const styles = StyleSheet.create({});

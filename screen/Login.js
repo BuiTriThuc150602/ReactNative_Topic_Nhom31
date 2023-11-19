@@ -6,10 +6,13 @@ import {
   TextInput,
   ImageBackground,
   Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 
-const Login = ({navigation}) => {
+const Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -17,27 +20,59 @@ const Login = ({navigation}) => {
         style={styles.background}
         resizeMode="cover"
       >
-        <View style={styles.formContainer}>
-          <TextInput placeholder="Email" style={styles.input} />
-          <TextInput placeholder="Password" style={styles.input} />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={100}
+          style={styles.formContainer}
+        >
+          <View style={{alignItems:'center' }}>
+            <Ionicons name="person-circle-outline" size={150} color="white" />
+          </View>
+          <TextInput
+            placeholder="Email"
+            placeholderTextColor={"white"}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor={"white"}
+            style={styles.input}
+          />
           <View style={styles.linksRow}>
-            <Pressable onPress={()=>navigation.navigate("SignUp")}>
-              <Text style={styles.links}>Sign Up</Text>
+            <Pressable onPress={() => navigation.navigate("SignUp")}>
+              <Text style={styles.links}>Don't have account ? Sign up now</Text>
             </Pressable>
             <Pressable>
               <Text style={styles.links}>Forgot Password</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.btnLogin} onPress={()=>navigation.navigate("HomeTab")}>
+          <Pressable
+            style={styles.btnLogin}
+            onPress={() => navigation.navigate("HomeTab")}
+          >
             <Text style={styles.Login}>Sign In</Text>
           </Pressable>
-        </View>
-        <Text style={{ color: "white", marginTop: 50 }}>Sign in with</Text>
-        <View style={styles.moreLogin}>
-          <Image source={require("../img/gg-logo.png")} resizeMode="contain" style={styles.logo_icons} />
-          <Image source={require("../img/fb-logo.png")}  resizeMode="contain" style={styles.logo_icons}/>
-          <Image source={require("../img/phone-logo.png")} resizeMode="contain" style={styles.logo_icons} />
-        </View>
+          <Text style={{ color: "white", marginTop: 50, textAlign: "center" }}>
+            Sign in with
+          </Text>
+          <View style={styles.moreLogin}>
+            <Image
+              source={require("../img/gg-logo.png")}
+              resizeMode="contain"
+              style={styles.logo_icons}
+            />
+            <Image
+              source={require("../img/fb-logo.png")}
+              resizeMode="contain"
+              style={styles.logo_icons}
+            />
+            <Image
+              source={require("../img/phone-logo.png")}
+              resizeMode="contain"
+              style={styles.logo_icons}
+            />
+          </View>
+        </KeyboardAvoidingView>
       </ImageBackground>
     </View>
   );
@@ -67,7 +102,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   links: {
-    color: "red",
+    color: "white",
     marginBottom: 20,
     fontWeight: "100",
     borderBottomWidth: 1,
@@ -92,12 +127,12 @@ const styles = StyleSheet.create({
   },
   moreLogin: {
     flexDirection: "row",
-    marginTop: 80
+    justifyContent: "center",
+    marginTop: 80,
   },
   logo_icons: {
     width: 60,
     height: 60,
     marginHorizontal: 10,
   },
-
 });
