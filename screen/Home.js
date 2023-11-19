@@ -4,17 +4,19 @@ import {
   Image,
   Linking,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  TextInput,
+
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import SwiperFlatList from "react-native-swiper-flatlist";
 
 const Home = ({ navigation }) => {
   const [result, setResult] = useState(null);
+  const [search, setSearch] = useState("");
   navigation.setOptions({
     headerTitle: "Tin Tức",
     headerStyle: {
@@ -81,10 +83,24 @@ const Home = ({ navigation }) => {
   const handlePressImage = (index) => {
     console.log(`Image at index ${index} pressed.`);
   };
+  const handleSearch = async () => {
+    console.log(search);
+  }
 
   return (
     <View style={styles.container}>
       <ScrollView>
+        <View style={styles.searchView}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Tìm kiếm"
+            onChangeText={(text) => setSearch(text)}
+            value={search}
+          />
+          <Pressable style={styles.searchButton} onPress={handleSearch}>
+            <Text style={styles.searchButtonText}>Tìm</Text>
+          </Pressable>
+        </View>
         <View style={styles.swiperContainer}>
           <Text style={styles.titleTop}>Tin Tức Nổi Bật</Text>
           <SwiperFlatList
@@ -132,18 +148,17 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
   swiperContainer: {
-    width: "100%",
+    width: "100vw",
     height: 300,
     marginBottom: 20,
     borderWidth: 1,
   },
   swiperItem: {
-    width: '100%',
+    width: 320,
     height: 200,
     borderRadius: 10,
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "gray",
+    borderBottomWidth: 1,
     borderRadius: 10,
     marginHorizontal: 10,
   },
@@ -176,4 +191,34 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "red",
   },
+  searchView: {
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: "row",
+  },
+  searchInput: {
+    width: "80%",
+    height: 40,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    margin: 10,
+    borderWidth: 0.5,
+  },
+  searchButton: {
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 15,
+    borderColor: "gray",
+    borderWidth: 0.5,
+  },
+  searchButtonText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "gray",
+  },
+
 });
