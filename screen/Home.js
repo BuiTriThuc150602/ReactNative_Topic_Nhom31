@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   FlatList,
   Image,
@@ -71,7 +70,7 @@ const Home = ({ navigation }) => {
       <View style={styles.container}>
         <Pressable
           style={styles.items}
-          onPress={() => Linking.getInitialURL(item.url)}
+          onPress={() => Linking.openURL(item.url)}
         >
           <Image source={{ uri: item.urlToImage }} style={styles.img} />
           <View style={styles.sourceView}>
