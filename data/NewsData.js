@@ -12,6 +12,7 @@ export const articles = [
       },
       publishedAt: "2023-01-01T10:00:00Z",
       url: "URL_bai_bao_1",
+      content:""
     },
   ];
   
