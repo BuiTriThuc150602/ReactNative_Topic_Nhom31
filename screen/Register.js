@@ -12,6 +12,50 @@ import {
 import React from "react";
 
 const Register = ({ navigation }) => {
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [dateOfBirth, setDateOfBirth] = React.useState("");
+  const [userName, setUserName] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+
+  const handleSignUp = () => {
+    if(userName.trim() === "" || dateOfBirth.trim() === "" || email.trim() === "" || password.trim() === "" || confirmPassword.trim() != password.trim()){
+      alert("Wrong information");
+    }
+    else{
+      //send data to api server 
+      sendUserData();
+      alert("Sign up successfully");
+      navigation.navigate("Login");
+
+    }
+
+  };
+  const sendUserData = async () => {
+    try {
+      const response = await fetch(
+        "https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            createdAt: new Date(),
+            email: email,
+            password: password,
+            dateOfBirth: new Date(dateOfBirth),
+            name: userName,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -24,11 +68,41 @@ const Register = ({ navigation }) => {
           keyboardVerticalOffset={100}
           style={styles.formContainer}
         >
-          <TextInput placeholder="User Name" placeholderTextColor={"white"} style={styles.input} />
-          <TextInput placeholder="Date Of Birth" placeholderTextColor={"white"} style={styles.input} />
-          <TextInput placeholder="Email"  placeholderTextColor={"white"} style={styles.input} />
-          <TextInput placeholder="Password" placeholderTextColor={"white"} style={styles.input} />
-          <TextInput placeholder="Confirm Password" placeholderTextColor={"white"} style={styles.input} />
+          <TextInput
+            placeholder="User Name"
+            placeholderTextColor={"white"}
+            style={styles.input}
+            value={userName}
+            onChangeText={(text) => setUserName(text)}
+          />
+          <TextInput
+            placeholder="Date Of Birth"
+            placeholderTextColor={"white"}
+            style={styles.input}
+            value={dateOfBirth}
+            onChangeText={(text) => setDateOfBirth(text)}
+          />
+          <TextInput
+            placeholder="Email"
+            placeholderTextColor={"white"}
+            style={styles.input}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor={"white"}
+            style={styles.input}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+          />
+          <TextInput
+            placeholder="Confirm Password"
+            placeholderTextColor={"white"}
+            style={styles.input}
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
+          />
 
           <View style={styles.linksRow}>
             <Pressable onPress={() => navigation.navigate("Login")}>
@@ -37,31 +111,32 @@ const Register = ({ navigation }) => {
           </View>
 
           <Pressable
-            style={styles.btnLogin}
-            onPress={() => navigation.navigate("Login")}
+            style={styles.btnSignUp}
+            onPress={() => handleSignUp()}
           >
-            <Text style={styles.Login}>Sign In</Text>
+            <Text style={styles.Login}>Sign Up</Text>
           </Pressable>
-        <Text style={{ color: "white", marginTop: 50 , textAlign: 'center'}}>Sign in with</Text>
-        <View style={styles.moreLogin}>
-          <Image
-            source={require("../img/gg-logo.png")}
-            resizeMode="contain"
-            style={styles.logo_icons}
-          />
-          <Image
-            source={require("../img/fb-logo.png")}
-            resizeMode="contain"
-            style={styles.logo_icons}
-          />
-          <Image
-            source={require("../img/phone-logo.png")}
-            resizeMode="contain"
-            style={styles.logo_icons}
-          />
-        </View>
+          <Text style={{ color: "white", marginTop: 50, textAlign: "center" }}>
+            Sign in with
+          </Text>
+          <View style={styles.moreLogin}>
+            <Image
+              source={require("../img/gg-logo.png")}
+              resizeMode="contain"
+              style={styles.logo_icons}
+            />
+            <Image
+              source={require("../img/fb-logo.png")}
+              resizeMode="contain"
+              style={styles.logo_icons}
+            />
+            <Image
+              source={require("../img/phone-logo.png")}
+              resizeMode="contain"
+              style={styles.logo_icons}
+            />
+          </View>
         </KeyboardAvoidingView>
-
       </ImageBackground>
     </View>
   );
@@ -73,7 +148,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
-    paddingBottom: 0
+    paddingBottom: 0,
   },
   background: {
     flex: 1,
@@ -106,7 +181,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
   },
-  btnLogin: {
+  btnSignUp: {
     backgroundColor: "#54D933",
     paddingVertical: 10,
     borderRadius: 15,

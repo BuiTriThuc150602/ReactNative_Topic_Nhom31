@@ -9,10 +9,46 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Login = ({ navigation }) => {
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [users, setUsers] = React.useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(
+            "https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users"
+          );
+          const data = await response.json();
+          setUsers(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+      fetchData();
+    }, [navigation])
+  );
+  console.log(users);
+
+  const handleLogin = () => {
+    const user = users.find((item) => item.email === email);
+    if (user) {
+      if (user.password === password) {
+        navigation.navigate("HomeTab");
+      } else {
+        alert("Wrong password");
+      }
+    } else {
+      alert("Wrong email");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -25,18 +61,22 @@ const Login = ({ navigation }) => {
           keyboardVerticalOffset={100}
           style={styles.formContainer}
         >
-          <View style={{alignItems:'center' }}>
+          <View style={{ alignItems: "center" }}>
             <Ionicons name="person-circle-outline" size={150} color="white" />
           </View>
           <TextInput
             placeholder="Email"
             placeholderTextColor={"white"}
             style={styles.input}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
           <TextInput
             placeholder="Password"
             placeholderTextColor={"white"}
             style={styles.input}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
           />
           <View style={styles.linksRow}>
             <Pressable onPress={() => navigation.navigate("SignUp")}>
@@ -46,10 +86,7 @@ const Login = ({ navigation }) => {
               <Text style={styles.links}>Forgot Password</Text>
             </Pressable>
           </View>
-          <Pressable
-            style={styles.btnLogin}
-            onPress={() => navigation.navigate("HomeTab")}
-          >
+          <Pressable style={styles.btnLogin} onPress={() => handleLogin()}>
             <Text style={styles.Login}>Sign In</Text>
           </Pressable>
           <Text style={{ color: "white", marginTop: 50, textAlign: "center" }}>

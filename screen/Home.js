@@ -95,13 +95,9 @@ const Home = ({ navigation }) => {
   }
 
   const topTrending = searchResult
-    ? searchResult
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 10)
+    ? searchResult.sort(() => Math.random() - 0.5).slice(0, 10)
     : result?.articles
-    ? result.articles
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 10)
+    ? result.articles.sort(() => Math.random() - 0.5).slice(0, 10)
     : [];
 
   const handlePressImage = (index) => {
@@ -122,8 +118,9 @@ const Home = ({ navigation }) => {
             onChangeText={(text) => (searchRef.current = text)}
           />
           <Pressable style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>Tìm
-            <Feather
+            <Text style={styles.searchButtonText}>
+              Tìm
+              <Feather
                 name="search"
                 style={{ width: 35, height: 35, marginLeft: 10 }}
                 color="gray"
@@ -154,7 +151,12 @@ const Home = ({ navigation }) => {
               </View>
             )}
           />
-          <Pressable style={styles.seeMoreBtn} onPress={()=>navigation.navigate("Trending",{trending : topTrending})}>
+          <Pressable
+            style={styles.seeMoreBtn}
+            onPress={() =>
+              navigation.navigate("Trending", { trending: topTrending })
+            }
+          >
             <Text style={styles.seeMoreTrending}>
               Xem Thêm
               <Feather
