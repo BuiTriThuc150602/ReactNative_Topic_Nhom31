@@ -11,10 +11,11 @@ import {
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import SwiperFlatList from "react-native-swiper-flatlist";
+import { Feather } from "@expo/vector-icons";
 
 const Home = ({ navigation }) => {
   const [result, setResult] = useState(null);
-  const searchRef = useRef(""); 
+  const searchRef = useRef("");
   const [searchPressed, setSearchPressed] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
 
@@ -93,16 +94,14 @@ const Home = ({ navigation }) => {
     return `${day}/${month}/${year}`;
   }
 
-  const images = searchResult
+  const topTrending = searchResult
     ? searchResult
         .sort(() => Math.random() - 0.5)
-        .slice(0, 3)
-        .map((item) => item.urlToImage)
+        .slice(0, 10)
     : result?.articles
     ? result.articles
         .sort(() => Math.random() - 0.5)
-        .slice(0, 3)
-        .map((item) => item.urlToImage)
+        .slice(0, 10)
     : [];
 
   const handlePressImage = (index) => {
@@ -123,13 +122,19 @@ const Home = ({ navigation }) => {
             onChangeText={(text) => (searchRef.current = text)}
           />
           <Pressable style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>Tìm</Text>
+            <Text style={styles.searchButtonText}>Tìm
+            <Feather
+                name="search"
+                style={{ width: 35, height: 35, marginLeft: 10 }}
+                color="gray"
+              />
+            </Text>
           </Pressable>
         </View>
         <View style={styles.swiperContainer}>
           <Text style={styles.titleTop}>Tin Tức Nổi Bật</Text>
           <SwiperFlatList
-            data={images}
+            data={topTrending.slice(0, 3)}
             autoplay
             autoplayDelay={3}
             autoplayLoop
@@ -142,13 +147,23 @@ const Home = ({ navigation }) => {
             renderItem={({ item }) => (
               <View style={styles.swiperItem}>
                 <Image
-                  source={{ uri: item }}
+                  source={{ uri: item.urlToImage }}
                   style={{ width: "100%", height: "100%" }}
                   resizeMode="cover"
                 />
               </View>
             )}
           />
+          <Pressable style={styles.seeMoreBtn} onPress={()=>navigation.navigate("Trending",{trending : topTrending})}>
+            <Text style={styles.seeMoreTrending}>
+              Xem Thêm
+              <Feather
+                name="arrow-right"
+                style={{ width: 35, height: 35, marginLeft: 10 }}
+                color="gray"
+              />
+            </Text>
+          </Pressable>
         </View>
         <FlatList
           data={searchResult || result?.articles || []}
@@ -223,6 +238,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
+    paddingHorizontal: 15,
   },
   searchInput: {
     width: "80%",
@@ -240,12 +256,26 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 10,
     borderRadius: 15,
-    borderColor: "gray",
-    borderWidth: 0.5,
+    borderColor: "green",
+    borderWidth: 1,
   },
   searchButtonText: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "gray",
+  },
+  seeMoreBtn: {
+    width: "90%",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+    marginHorizontal: 10,
+    marginVertical: 10,
+  },
+  seeMoreTrending: {
+    textAlign: "right",
+    fontSize: 15,
+    fontWeight: "bold",
+    fontStyle: "italic",
     color: "gray",
   },
 });
