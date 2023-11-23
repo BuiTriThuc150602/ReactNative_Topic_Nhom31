@@ -4,6 +4,7 @@ import { Feather, MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 const Info = ({ navigation, route }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const userLogin = route.params?.userLogin;
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev);
   };
@@ -11,6 +12,14 @@ const Info = ({ navigation, route }) => {
   const logout = () => {
     navigation.navigate("Login");
   };
+
+  function formatTime(time) {
+    const date = new Date(time);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${day}/${month}/${year}`;
+  }
 
   useEffect(() => {
     navigation.setOptions({
@@ -49,17 +58,17 @@ const Info = ({ navigation, route }) => {
       <View style={styles.formInformation}>
         <View style={styles.form}>
           <Text style={styles.txtTitle}>Họ và tên:</Text>
-          <Text style={styles.txt}>Nguyễn Văn A</Text>
+          <Text style={styles.txt}>{userLogin.name}</Text>
         </View>
 
         <View style={styles.form}>
           <Text style={styles.txtTitle}>Ngày Sinh:</Text>
-          <Text style={styles.txt}>12/12/2002</Text>
+          <Text style={styles.txt}>{formatTime(userLogin.dateOfBirth)}</Text>
         </View>
 
         <View style={styles.form}>
           <Text style={styles.txtTitle}>Email:</Text>
-          <Text style={styles.txt}>nguyenvanA@gmail.com</Text>
+          <Text style={styles.txt}>{userLogin.email}</Text>
         </View>
 
         <View style={styles.form}>
@@ -67,7 +76,7 @@ const Info = ({ navigation, route }) => {
           <TextInput
             secureTextEntry={showPassword ? false : true}
             style={styles.pwd}
-            value="123456"
+            value={userLogin.password}
             focusable={false}
           ></TextInput>
           <Pressable onPress={toggleShowPassword}>

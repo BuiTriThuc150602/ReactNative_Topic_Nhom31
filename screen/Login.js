@@ -9,14 +9,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 const Login = ({ navigation }) => {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [users, setUsers] = React.useState([]);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [users, setUsers] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -34,13 +34,12 @@ const Login = ({ navigation }) => {
       fetchData();
     }, [navigation])
   );
-  console.log(users);
 
   const handleLogin = () => {
     const user = users.find((item) => item.email === email);
     if (user) {
       if (user.password === password) {
-        navigation.navigate("HomeTab");
+        navigation.navigate("HomeTab", { userLogin: user });
       } else {
         alert("Wrong password");
       }

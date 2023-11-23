@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Register = ({ navigation }) => {
   const [email, setEmail] = React.useState("");
@@ -17,6 +18,22 @@ const Register = ({ navigation }) => {
   const [dateOfBirth, setDateOfBirth] = React.useState("");
   const [userName, setUserName] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [date,setDate] = useState(new Date());
+  const [showDate, setShowDate] = useState(true);
+
+  const onChange = (event, selectedDate) => {
+    if(event.type === "dismissed"){
+      showDatepicker();
+      return;
+    }    
+    const currentDate = selectedDate || date;
+    setShowDate(false);
+    setDate(currentDate);
+    setDateOfBirth(currentDate.toString());
+  }
+  const showDatepicker = () => {
+    setShowDate(!showDate);
+  }
 
   const handleSignUp = () => {
     if(userName.trim() === "" || dateOfBirth.trim() === "" || email.trim() === "" || password.trim() === "" || confirmPassword.trim() != password.trim()){
@@ -75,6 +92,16 @@ const Register = ({ navigation }) => {
             value={userName}
             onChangeText={(text) => setUserName(text)}
           />
+          {
+            showDate && (
+              <DateTimePicker
+                value={date}
+                mode={"date"}
+                display="spinner"
+                onChange={onChange}
+              />
+            )
+          }
           <TextInput
             placeholder="Date Of Birth"
             placeholderTextColor={"white"}
