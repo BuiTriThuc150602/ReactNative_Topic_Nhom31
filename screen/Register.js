@@ -20,12 +20,12 @@ const Register = ({ navigation }) => {
   const [userName, setUserName] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [date, setDate] = useState(new Date());
-  const [showDate, setShowDate] = useState(true);
+  const [showDate, setShowDate] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (event, selectedDate) => {
     if (event.type === "dismissed") {
-      showDatepicker();
+      hideDatePicker();
       return;
     }
     const currentDate = selectedDate || date;
@@ -34,7 +34,10 @@ const Register = ({ navigation }) => {
     setDateOfBirth(formatTime(currentDate));
   };
   const showDatepicker = () => {
-    setShowDate(!showDate);
+    setShowDate(true);
+  };
+  const hideDatePicker = () => {
+    setShowDate(false);
   };
 
   function formatTime(time) {
@@ -61,6 +64,8 @@ const Register = ({ navigation }) => {
     }
   };
   const sendUserData = async () => {
+    console.log("dob", date);
+    console.log("New dob", new Date(date)); 
     try {
       const response = await fetch(
         "https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users",
@@ -73,7 +78,7 @@ const Register = ({ navigation }) => {
             createdAt: new Date(),
             email: email,
             password: password,
-            dateOfBirth: new Date(dateOfBirth),
+            dateOfBirth: new Date(date),
             name: userName,
           }),
         }

@@ -29,7 +29,7 @@ const Trending = ({ navigation, route }) => {
       <View style={styles.container}>
         <Pressable
           style={styles.items}
-          onPress={() => Linking.openURL(item.url)}
+          onPress={() => navigation.navigate("Detail", { uri: item.url })}
         >
           <Image source={{ uri: item.urlToImage }} style={styles.img} />
           <View style={styles.sourceView}>
