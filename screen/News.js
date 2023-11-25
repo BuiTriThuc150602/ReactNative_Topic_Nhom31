@@ -14,14 +14,25 @@ import {
 import React, { useEffect, useState, useRef } from "react";
 import SwiperFlatList from "react-native-swiper-flatlist";
 import { Feather } from "@expo/vector-icons";
+import SelectDropdown from "react-native-select-dropdown";
+import { Platform } from "react-native";
 
 const News = ({ navigation, route }) => {
   const [result, setResult] = useState(null);
   const searchRef = useRef("");
   const [searchPressed, setSearchPressed] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
-
   const [isLoading, setIsLoading] = useState(true);
+
+  const typeFilter = ["Nguồn", "Từ khóa"];
+  const sourceFilter = ["Tất cả", "VNExpress", "Tinh Tế", "Sputnik", "VOA"];
+  const [filter, setFilter] = useState(typeFilter[0]);
+  const [source, setSource] = useState(sourceFilter[0]);
+  const [keyword, setKeyword] = useState("");
+  const [url, setUrl] = useState(
+    "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+  );
+
   navigation.setOptions({
     headerTitle: "Tin Tức",
     headerStyle: {
@@ -41,7 +52,8 @@ const News = ({ navigation, route }) => {
         const response = await fetch(
           // "https://newsapi.org/v2/everything?q=Apple&language=vi&apiKey=33f7b18dad144a419a41f633c53c8701"
           // "https://newsapi.org/v2/everything?domains=tinhte.vn&apiKey=33f7b18dad144a419a41f633c53c8701",
-          "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,thanhnien.vn&apiKey=33f7b18dad144a419a41f633c53c8701"
+          //   "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+          url
         );
         const data = await response.json();
         setResult(data);
@@ -117,7 +129,7 @@ const News = ({ navigation, route }) => {
     if (result !== null) {
       setIsLoading(false);
     }
-  }, [result,searchResult]); 
+  }, [result, searchResult]);
 
   if (isLoading) {
     return (
@@ -139,6 +151,46 @@ const News = ({ navigation, route }) => {
           <Pressable style={styles.searchButton} onPress={handleSearch}>
             <Text style={{ fontWeight: "600", color: "gray" }}>Tìm</Text>
           </Pressable>
+        </View>
+        <View style={styles.filterView}>
+          <Text style={styles.filterText}>Lọc theo: </Text>
+          <SelectDropdown
+            data={typeFilter}
+            onSelect={(selectedItem, index) => {
+              setFilter(selectedItem);
+            }}
+            defaultButtonText={typeFilter[0]}
+            buttonStyle={styles.filterButton}
+            buttonTextStyle={styles.filterButtonText}
+            dropdownStyle={styles.filterDropdown}
+            rowStyle={styles.filterRow}
+            renderDropdownIcon={() => (
+              <Feather name="chevron-down" size={20} color="gray" />
+            )}
+          />
+          <Text style={styles.filterText}> {filter}: </Text>
+          {filter === typeFilter[0] ? (
+            <SelectDropdown
+              data={sourceFilter}
+              onSelect={(selectedItem, index) => {
+                setSource(selectedItem);
+              }}
+              defaultButtonText={sourceFilter[0]}
+              buttonStyle={styles.filterButton}
+              buttonTextStyle={styles.filterButtonText}
+              dropdownStyle={styles.filterDropdown}
+              rowStyle={styles.filterRow}
+              renderDropdownIcon={() => (
+                <Feather name="chevron-down" size={20} color="gray" />
+              )}
+            />
+          ) : (
+            <TextInput
+              style={styles.filterKeryword}
+              placeholder="Nhập từ khóa"
+              onChangeText={(text) => setKeyword(text)}
+            />
+          )}
         </View>
         {searchResult && searchResult.length === 0 && (
           <View>
@@ -165,45 +217,6 @@ const News = ({ navigation, route }) => {
         )}
         {searchResult && searchResult.length > 0 && (
           <SafeAreaView>
-            {/* <View style={styles.swiperContainer}>
-                <Text style={styles.titleTop}>Tin Tức Nổi Bật</Text>
-                <SwiperFlatList
-                  data={topTrending.slice(0, 3)}
-                  autoplay
-                  autoplayDelay={3}
-                  autoplayLoop
-                  onPress={handlePressImage}
-                  showPagination
-                  paginationDefaultColor="gray"
-                  paginationActiveColor="cyan"
-                  paginationStyleItem={{ width: 8, height: 8 }}
-                  paginationStyleItemActive={{ width: 12, height: 12 }}
-                  renderItem={({ item }) => (
-                    <View style={styles.swiperItem}>
-                      <Image
-                        source={{ uri: item.urlToImage }}
-                        style={{ width: "100%", height: "100%" }}
-                        resizeMode="cover"
-                      />
-                    </View>
-                  )}
-                />
-                <Pressable
-                  style={styles.seeMoreBtn}
-                  onPress={() =>
-                    navigation.navigate("Nổi Bật", { trending: topTrending })
-                  }
-                >
-                  <Text style={styles.seeMoreTrending}>
-                    Xem Thêm
-                    <Feather
-                      name="arrow-right"
-                      style={{ width: 35, height: 35, marginLeft: 10 }}
-                      color="gray"
-                    />
-                  </Text>
-                </Pressable>
-              </View> */}
             <Text style={styles.titleTop}>
               Tin Tức Liên Quan Đến : {searchRef.current}
             </Text>
@@ -330,7 +343,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
-    paddingHorizontal: 15,
+    paddingHorizontal: 5,
   },
   searchInput: {
     width: "80%",
@@ -363,5 +376,49 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontStyle: "italic",
     color: "gray",
+  },
+  filterView: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 5,
+  },
+  filterText: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "gray",
+  },
+  filterButton: {
+    width: 120,
+    height: 40,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    marginBottom: 10,
+    borderWidth: 0.5,
+  },
+  filterButtonText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "gray",
+  },
+  filterDropdown: {
+    width: 150,
+    height: 'auto',
+    borderRadius: 10,
+    borderWidth: 0.5,
+    zIndex: 1,
+  },
+  filterRow: {
+    margin: 5,
+  },
+  filterKeryword: {
+    width: 120,
+    height: 40,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    margin: 5,
+    borderWidth: 0.5,
   },
 });

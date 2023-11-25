@@ -1,11 +1,9 @@
-import { StyleSheet } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Home from "./Home";
 import Info from "./Info";
 import Trending from "./Trending";
-import Detail from "./Detail";
 
 const Tab = createBottomTabNavigator();
 
