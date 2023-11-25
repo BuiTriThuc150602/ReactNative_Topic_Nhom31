@@ -46,15 +46,46 @@ const News = ({ navigation, route }) => {
     },
   });
 
+  const getFilter = () => {
+      if (filter === typeFilter[0]) {
+        if (source === sourceFilter[0]) {
+          setUrl(
+            "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+          );
+        } else if (source === sourceFilter[1]) {
+          setUrl(
+            "https://newsapi.org/v2/everything?domains=vnexpress.net&apiKey=33f7b18dad144a419a41f633c53c8701"
+          );
+        } else if (source === sourceFilter[2]) {
+          setUrl(
+            "https://newsapi.org/v2/everything?domains=tinhte.vn&apiKey=33f7b18dad144a419a41f633c53c8701"
+          );
+        } else if (source === sourceFilter[3]) {
+          setUrl(
+            "https://newsapi.org/v2/everything?domains=sputniknews.vn&apiKey=33f7b18dad144a419a41f633c53c8701"
+          );
+        } else if (source === sourceFilter[4]) {
+          setUrl(
+            "https://newsapi.org/v2/everything?domains=voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+          );
+        }
+      } else if (filter === typeFilter[1]) {
+        if (keyword === "") {
+          setUrl(
+            "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+          );
+        } else {
+          setUrl(
+            `https://newsapi.org/v2/everything?q=${keyword}&language=vi&apiKey=33f7b18dad144a419a41f633c53c8701`
+          );
+        }
+      }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          // "https://newsapi.org/v2/everything?q=Apple&language=vi&apiKey=33f7b18dad144a419a41f633c53c8701"
-          // "https://newsapi.org/v2/everything?domains=tinhte.vn&apiKey=33f7b18dad144a419a41f633c53c8701",
-          //   "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
-          url
-        );
+        const response = await fetch(url);
         const data = await response.json();
         setResult(data);
       } catch (error) {
@@ -63,7 +94,7 @@ const News = ({ navigation, route }) => {
     };
 
     fetchData();
-  }, []);
+  }, [url]);
 
   useEffect(() => {
     const handleSearch = async () => {
@@ -191,6 +222,14 @@ const News = ({ navigation, route }) => {
               onChangeText={(text) => setKeyword(text)}
             />
           )}
+          <Pressable onPress={getFilter}>
+            <Feather
+              name="filter"
+              size={25}
+              color="green"
+              style={styles.filterIcon}
+            />
+          </Pressable>
         </View>
         {searchResult && searchResult.length === 0 && (
           <View>
@@ -404,7 +443,7 @@ const styles = StyleSheet.create({
   },
   filterDropdown: {
     width: 150,
-    height: 'auto',
+    height: "auto",
     borderRadius: 10,
     borderWidth: 0.5,
     zIndex: 1,
@@ -420,5 +459,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     margin: 5,
     borderWidth: 0.5,
+  },
+  filterIcon: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    padding: 5,
+    margin: 5,
+    borderColor: "green",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
