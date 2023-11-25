@@ -10,7 +10,8 @@ import {
   Platform,
 } from "react-native";
 import React, { useState } from "react";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { CheckBox } from "react-native-elements/dist/checkbox/CheckBox";
 
 const Register = ({ navigation }) => {
   const [email, setEmail] = React.useState("");
@@ -18,35 +19,46 @@ const Register = ({ navigation }) => {
   const [dateOfBirth, setDateOfBirth] = React.useState("");
   const [userName, setUserName] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [date,setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date());
   const [showDate, setShowDate] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (event, selectedDate) => {
-    if(event.type === "dismissed"){
+    if (event.type === "dismissed") {
       showDatepicker();
       return;
-    }    
+    }
     const currentDate = selectedDate || date;
     setShowDate(false);
     setDate(currentDate);
-    setDateOfBirth(currentDate.toString());
-  }
+    setDateOfBirth(formatTime(currentDate));
+  };
   const showDatepicker = () => {
     setShowDate(!showDate);
+  };
+
+  function formatTime(time) {
+    const date = new Date(time);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${day}/${month}/${year}`;
   }
 
   const handleSignUp = () => {
-    if(userName.trim() === "" || dateOfBirth.trim() === "" || email.trim() === "" || password.trim() === "" || confirmPassword.trim() != password.trim()){
+    if (
+      userName.trim() === "" ||
+      dateOfBirth.trim() === "" ||
+      email.trim() === "" ||
+      password.trim() === "" ||
+      confirmPassword.trim() != password.trim()
+    ) {
       alert("Wrong information");
-    }
-    else{
-      //send data to api server 
+    } else {
       sendUserData();
       alert("Sign up successfully");
       navigation.navigate("Login");
-
     }
-
   };
   const sendUserData = async () => {
     try {
@@ -71,7 +83,7 @@ const Register = ({ navigation }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -92,22 +104,21 @@ const Register = ({ navigation }) => {
             value={userName}
             onChangeText={(text) => setUserName(text)}
           />
-          {
-            showDate && (
-              <DateTimePicker
-                value={date}
-                mode={"date"}
-                display="spinner"
-                onChange={onChange}
-              />
-            )
-          }
+          {showDate && (
+            <DateTimePicker
+              value={date}
+              mode={"date"}
+              display="spinner"
+              onChange={onChange}
+            />
+          )}
           <TextInput
             placeholder="Date Of Birth"
             placeholderTextColor={"white"}
             style={styles.input}
             value={dateOfBirth}
             onChangeText={(text) => setDateOfBirth(text)}
+            onFocus={showDatepicker}
           />
           <TextInput
             placeholder="Email"
@@ -122,6 +133,7 @@ const Register = ({ navigation }) => {
             style={styles.input}
             value={password}
             onChangeText={(text) => setPassword(text)}
+            secureTextEntry={!showPassword}
           />
           <TextInput
             placeholder="Confirm Password"
@@ -129,18 +141,28 @@ const Register = ({ navigation }) => {
             style={styles.input}
             value={confirmPassword}
             onChangeText={(text) => setConfirmPassword(text)}
+            secureTextEntry={!showPassword}
           />
 
           <View style={styles.linksRow}>
+            <CheckBox
+              title="Show password"
+              checked={showPassword}
+              onPress={() => setShowPassword(!showPassword)}
+              containerStyle={styles.checkStyle}
+              textStyle={{
+                color: "white",
+                fontStyle: "italic",
+                fontWeight: "100",
+              }}
+              checkedColor="green"
+            />
             <Pressable onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.links}>Have an account ? Sign now</Text>
+              <Text style={styles.links}>Have an account ? Sign In now</Text>
             </Pressable>
           </View>
 
-          <Pressable
-            style={styles.btnSignUp}
-            onPress={() => handleSignUp()}
-          >
+          <Pressable style={styles.btnSignUp} onPress={() => handleSignUp()}>
             <Text style={styles.Login}>Sign Up</Text>
           </Pressable>
           <Text style={{ color: "white", marginTop: 50, textAlign: "center" }}>
@@ -192,21 +214,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "white",
-    color: Platform.OS === "web" ? "white" : "white",
+    color: "white",
   },
   links: {
     color: "white",
     marginBottom: 20,
     fontWeight: "300",
-    borderWidth: 1,
-    borderColor: "green",
     padding: 10,
-    borderRadius: 10,
     fontStyle: "italic",
   },
   linksRow: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-around",
+    alignItems: "center",
+    padding: 0,
   },
   btnSignUp: {
     backgroundColor: "#54D933",
@@ -224,11 +245,17 @@ const styles = StyleSheet.create({
   moreLogin: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 80,
+    marginTop: 50,
   },
   logo_icons: {
     width: 60,
     height: 60,
     marginHorizontal: 10,
+  },
+  checkStyle: {
+    backgroundColor: "none",
+    borderWidth: 0,
+    marginBottom: 25,
+    marginLeft: 0,
   },
 });

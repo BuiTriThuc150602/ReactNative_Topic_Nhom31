@@ -1,7 +1,16 @@
-import {  StyleSheet, Text, View,FlatList,Pressable,Image,Linking } from 'react-native'
-import React from 'react'
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Pressable,
+  Image,
+  Linking,
+  SafeAreaView,
+} from "react-native";
+import React from "react";
 
-const Trending = ({navigation, route}) => {
+const Trending = ({ navigation, route }) => {
   const topTrending = route.params?.trending || [];
   navigation.setOptions({
     headerTitle: "Nổi Bật Hôm Nay",
@@ -44,25 +53,23 @@ const Trending = ({navigation, route}) => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
+      <SafeAreaView style={{width: '100%',height: '100%',}}>
       <Text style={styles.titleTop}>Tin nổi bật hôm nay</Text>
-      <FlatList
-          data={topTrending || []}
-          renderItem={renderItem}
-        />
+        <FlatList data={topTrending || []} renderItem={renderItem} />
+      </SafeAreaView>
     </View>
-  )
-}
+  );
+};
 
-export default Trending
+export default Trending;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },items: {
+  },
+  items: {
     width: "90%",
     height: 320,
     borderBottomWidth: 1,
@@ -97,5 +104,6 @@ const styles = StyleSheet.create({
     color: "gray",
     textAlign: "center",
     marginVertical: 15,
+    borderBottomEndRadius: 10,
   },
-})
+});

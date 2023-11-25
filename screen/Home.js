@@ -118,14 +118,7 @@ const Home = ({ navigation }) => {
             onChangeText={(text) => (searchRef.current = text)}
           />
           <Pressable style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>
-              Tìm
-              <Feather
-                name="search"
-                style={{ width: 35, height: 35, marginLeft: 10 }}
-                color="gray"
-              />
-            </Text>
+            <Text style={{fontWeight:"600",color:'gray',}}>Tìm</Text>
           </Pressable>
         </View>
         <View style={styles.swiperContainer}>
@@ -252,19 +245,13 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
   },
   searchButton: {
+    flex:1,
     height: 40,
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
-    marginVertical: 10,
     borderRadius: 15,
     borderColor: "green",
     borderWidth: 1,
-  },
-  searchButtonText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "gray",
   },
   seeMoreBtn: {
     width: "90%",

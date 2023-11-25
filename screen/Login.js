@@ -12,11 +12,13 @@ import {
 import React, { useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { CheckBox } from "react-native-elements";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [users, setUsers] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -76,6 +78,17 @@ const Login = ({ navigation }) => {
             style={styles.input}
             value={password}
             onChangeText={(text) => setPassword(text)}
+            secureTextEntry={!showPassword}
+          />
+          <CheckBox
+            title="Show password"
+            checked={showPassword}
+            onPress={() => setShowPassword(!showPassword)}
+            containerStyle={styles.checkStyle}
+            textStyle={{ color: "white",fontStyle:"italic",fontWeight:"100" }}
+            checkedColor="green"
+
+          
           />
           <View style={styles.linksRow}>
             <Pressable onPress={() => navigation.navigate("SignUp")}>
@@ -164,11 +177,18 @@ const styles = StyleSheet.create({
   moreLogin: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 80,
+    marginTop: 50,
   },
   logo_icons: {
     width: 60,
     height: 60,
     marginHorizontal: 10,
+  },
+  checkStyle: {
+    backgroundColor: "none",
+    borderWidth: 0,
+    color: "white",
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
 });
