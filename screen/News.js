@@ -1,7 +1,6 @@
 import {
   FlatList,
   Image,
-  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,27 +18,6 @@ import SelectDropdown from "react-native-select-dropdown";
 import { Platform } from "react-native";
 
 const News = ({ navigation, route }) => {
-    const userLogin = route.params?.userLogin;
-    console.log("news" + userLogin.name);
-  const [result, setResult] = useState(null);
-  const searchRef = useRef("");
-  const [searchPressed, setSearchPressed] = useState(false);
-  const [searchResult, setSearchResult] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { width, height } =
-    Platform.OS === "web" ? window.screen : Dimensions.get("window");
-
-  const typeFilter = ["Nguồn", "Từ khóa"];
-  const sourceFilter = ["Tất cả", "VNExpress", "Tinh Tế", "Sputnik", "VOA"];
-  const [filter, setFilter] = useState(typeFilter[0]);
-  const [source, setSource] = useState(sourceFilter[0]);
-  const [keyword, setKeyword] = useState("");
-  const [url, setUrl] = useState(
-    "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
-  );
-  const [filterPressed, setFilterPressed] = useState(false);
-  const [isFiltering, setIsFiltering] = useState(false);
-
   navigation.setOptions({
     headerTitle: "Tin Tức",
     headerStyle: {
@@ -52,6 +30,53 @@ const News = ({ navigation, route }) => {
       fontSize: 20,
     },
   });
+
+  const { width, height } =
+    Platform.OS === "web" ? window.screen : Dimensions.get("window");
+
+  const { likedNews, recenlyViewedNews } = route.params?.userLogin || {
+    likedNews: [],
+    recenlyViewedNews: [],
+  };
+
+  const [likedNewsList, setLikedNewsList] = useState(likedNews);
+  const [recenlyViewedNewsList, setRecenlyViewedNewsList] =
+    useState(recenlyViewedNews);
+  const [like, setLike] = useState(false);
+
+  const [result, setResult] = useState(null);
+  const searchRef = useRef("");
+  const [searchPressed, setSearchPressed] = useState(false);
+  const [searchResult, setSearchResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [topTrending, setTopTrending] = useState([]);
+
+  const typeFilter = ["Nguồn", "Từ khóa"];
+  const sourceFilter = ["Tất cả", "VNExpress", "Tinh Tế", "Sputnik", "VOA"];
+  const [filter, setFilter] = useState(typeFilter[0]);
+  const [source, setSource] = useState(sourceFilter[0]);
+  const [keyword, setKeyword] = useState("");
+  const [url, setUrl] = useState(
+    "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+  );
+  const [filterPressed, setFilterPressed] = useState(false);
+
+  //Top Trending
+  //************** */
+  useEffect(() => {
+    const getTopTrending = async () => {
+      try {
+        const response = await fetch(
+          "https://newsapi.org/v2/top-headlines?country=us&apiKey=33f7b18dad144a419a41f633c53c8701"
+        );
+        const data = await response.json();
+        setTopTrending(data.articles);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    getTopTrending();
+  }, []);
 
   useEffect(() => {
     const getFilter = async () => {
@@ -90,11 +115,9 @@ const News = ({ navigation, route }) => {
       }
     };
     if (filterPressed) {
-      setIsFiltering(true);
       setFilterPressed(false);
       getFilter();
     }
-    // setIsFiltering(false);
   }, [filterPressed]);
 
   //Get data from API
@@ -134,13 +157,8 @@ const News = ({ navigation, route }) => {
     }
   }, [result, searchPressed]);
 
-  const handlePressImage = (index) => {
-    console.log(`Image at index ${index} pressed.`);
-  };
-
   //Loading
   //************** */
-
   useEffect(() => {
     if (result !== null) {
       setIsLoading(false);
@@ -163,7 +181,10 @@ const News = ({ navigation, route }) => {
       <View style={styles.container}>
         <Pressable
           style={styles.items}
-          onPress={() => navigation.navigate("Detail", { uri: item.url })}
+          onPress={() => {
+            navigation.navigate("Detail", { uri: item.url });
+            recenlyViewedHandler.bind(this, { item })();
+          }}
         >
           <Image source={{ uri: item.urlToImage }} style={styles.img} />
           <View style={styles.sourceView}>
@@ -174,10 +195,122 @@ const News = ({ navigation, route }) => {
           </View>
           <Text style={styles.title}>{item.title}</Text>
         </Pressable>
+        <Pressable style={styles.btnLike}>
+          <Feather
+            name="heart"
+            size={25}
+            color={likedNewsList?.includes(item) ? "red" : "gray"}
+            onPress={likePressed.bind(this, { item })}
+          />
+        </Pressable>
       </View>
     );
   };
 
+  //Liked Handler
+  //************** */
+  const likedHandler = (item) => {
+    setLike(true);
+    if (!checkLiked(item)) {
+      setLikedNewsList([...likedNewsList, item]);
+    }
+  };
+  // dislikedHandler
+  //************** */
+  const dislikedHandler = (item) => {
+    setLike(false);
+    // remove item from likedNewsList
+    const newLikedNewsList = likedNewsList.filter(
+      (likedItem) => likedItem !== item
+    );
+    setLikedNewsList(newLikedNewsList);
+  };
+
+  //Like Pressed
+  //************** */
+  const likePressed = ({ item }) => {
+    like ? dislikedHandler(item) : likedHandler(item);
+    // update likedNewsList in userLogin
+    const userLogin = route.params?.userLogin || {
+      likedNews: [],
+      recenlyViewedNews: [],
+    };
+    userLogin.likedNews = likedNewsList;
+    userLogin.recenlyViewedNews = recenlyViewedNewsList;
+    navigation.setParams({ userLogin });
+    // update likedNewsList to api server
+    const updateLikedNewsList = async () => {
+      try {
+        await fetch(
+          `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              likedNews: likedNewsList,
+            }),
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    updateLikedNewsList();
+  };
+
+  //Recenly Viewed Handler
+  //************** */
+  const recenlyViewedHandler = ({ item }) => {
+    if (recenlyViewedNewsList.length < 10) {
+      setRecenlyViewedNewsList([...recenlyViewedNewsList, item]);
+    } else {
+      setRecenlyViewedNewsList([
+        ...recenlyViewedNewsList.slice(1, 10),
+        item,
+      ]);
+    }
+    // update recenlyViewedNewsList in userLogin
+    const userLogin = route.params?.userLogin || {
+      likedNews: [],
+      recenlyViewedNews: [],
+    };
+    userLogin.likedNews = likedNewsList;
+    userLogin.recenlyViewedNews = recenlyViewedNewsList;
+    navigation.setParams({ userLogin });
+    // update recenlyViewedNewsList to api server
+    const updateRecenlyViewedNewsList = async () => {
+      try {
+        await fetch(
+          `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              recenlyViewedNews: recenlyViewedNewsList,
+            }),
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    updateRecenlyViewedNewsList();
+  };
+
+  function checkLiked(item) {
+    if (likedNewsList.includes(item)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //Format Time
+  //************** */
   function formatTime(time) {
     const date = new Date(time);
     const year = date.getFullYear();
@@ -185,12 +318,6 @@ const News = ({ navigation, route }) => {
     const day = date.getDate();
     return `${day}/${month}/${year}`;
   }
-
-  const topTrending = searchResult
-    ? searchResult.sort(() => Math.random() - 0.5).slice(0, 10)
-    : result?.articles
-    ? result.articles.sort(() => Math.random() - 0.5).slice(0, 10)
-    : [];
 
   return (
     <View style={styles.container}>
@@ -215,7 +342,7 @@ const News = ({ navigation, route }) => {
               <View style={styles.filterInput}>
                 <SelectDropdown
                   data={typeFilter}
-                  onSelect={(selectedItem, index) => {
+                  onSelect={(selectedItem) => {
                     setFilter(selectedItem);
                   }}
                   defaultButtonText={typeFilter[0]}
@@ -230,7 +357,7 @@ const News = ({ navigation, route }) => {
                 {filter === typeFilter[0] ? (
                   <SelectDropdown
                     data={sourceFilter}
-                    onSelect={(selectedItem, index) => {
+                    onSelect={(selectedItem) => {
                       setSource(selectedItem);
                     }}
                     defaultButtonText={sourceFilter[0]}
@@ -259,12 +386,11 @@ const News = ({ navigation, route }) => {
               style={styles.searchButton}
             >
               <Feather name="filter" size={25} color="gray" />
-              {/* <Text style={{ fontWeight: "600", color: "gray" }}>Lọc</Text> */}
             </Pressable>
           </View>
         </View>
         {searchResult && searchResult.length === 0 && (
-          <View>
+          <View style={styles.container}>
             <Text style={styles.titleTop}>
               Tin Tức Liên Quan Đến : {searchRef.current}
             </Text>
@@ -306,7 +432,6 @@ const News = ({ navigation, route }) => {
                 autoplay
                 autoplayDelay={3}
                 autoplayLoop
-                onPress={handlePressImage}
                 showPagination
                 paginationDefaultColor="gray"
                 paginationActiveColor="cyan"
@@ -423,6 +548,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 5,
   },
+
+  btnLike: {
+    position: "absolute",
+    bottom: 20,
+    right: 30,
+    opacity: 0.5,
+  },
+
   searchInput: {
     width: "80%",
     height: 40,

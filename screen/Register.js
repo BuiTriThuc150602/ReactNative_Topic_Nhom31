@@ -78,6 +78,8 @@ const Register = ({ navigation }) => {
             password: password,
             dateOfBirth: new Date(date),
             name: userName,
+            likedNews: [],
+            recenlyViewedNews: [],
           }),
         }
       );
