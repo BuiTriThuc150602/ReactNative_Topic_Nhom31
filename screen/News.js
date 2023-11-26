@@ -10,6 +10,7 @@ import {
   TextInput,
   SafeAreaView,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import SwiperFlatList from "react-native-swiper-flatlist";
@@ -18,11 +19,15 @@ import SelectDropdown from "react-native-select-dropdown";
 import { Platform } from "react-native";
 
 const News = ({ navigation, route }) => {
+    const userLogin = route.params?.userLogin;
+    console.log("news" + userLogin.name);
   const [result, setResult] = useState(null);
   const searchRef = useRef("");
   const [searchPressed, setSearchPressed] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { width, height } =
+    Platform.OS === "web" ? window.screen : Dimensions.get("window");
 
   const typeFilter = ["Nguồn", "Từ khóa"];
   const sourceFilter = ["Tất cả", "VNExpress", "Tinh Tế", "Sputnik", "VOA"];
@@ -32,6 +37,8 @@ const News = ({ navigation, route }) => {
   const [url, setUrl] = useState(
     "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
   );
+  const [filterPressed, setFilterPressed] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   navigation.setOptions({
     headerTitle: "Tin Tức",
@@ -46,7 +53,8 @@ const News = ({ navigation, route }) => {
     },
   });
 
-  const getFilter = () => {
+  useEffect(() => {
+    const getFilter = async () => {
       if (filter === typeFilter[0]) {
         if (source === sourceFilter[0]) {
           setUrl(
@@ -80,8 +88,17 @@ const News = ({ navigation, route }) => {
           );
         }
       }
-  };
+    };
+    if (filterPressed) {
+      setIsFiltering(true);
+      setFilterPressed(false);
+      getFilter();
+    }
+    // setIsFiltering(false);
+  }, [filterPressed]);
 
+  //Get data from API
+  //************** */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -95,6 +112,9 @@ const News = ({ navigation, route }) => {
 
     fetchData();
   }, [url]);
+
+  //Search
+  //************** */
 
   useEffect(() => {
     const handleSearch = async () => {
@@ -113,6 +133,30 @@ const News = ({ navigation, route }) => {
       setSearchPressed(false);
     }
   }, [result, searchPressed]);
+
+  const handlePressImage = (index) => {
+    console.log(`Image at index ${index} pressed.`);
+  };
+
+  //Loading
+  //************** */
+
+  useEffect(() => {
+    if (result !== null) {
+      setIsLoading(false);
+    }
+  }, [result, searchResult]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="skyblue" />
+      </View>
+    );
+  }
+
+  //Render Item
+  //************** */
 
   const renderItem = ({ item }) => {
     return (
@@ -148,88 +192,76 @@ const News = ({ navigation, route }) => {
     ? result.articles.sort(() => Math.random() - 0.5).slice(0, 10)
     : [];
 
-  const handlePressImage = (index) => {
-    console.log(`Image at index ${index} pressed.`);
-  };
-
-  const handleSearch = () => {
-    setSearchPressed(true);
-  };
-
-  useEffect(() => {
-    if (result !== null) {
-      setIsLoading(false);
-    }
-  }, [result, searchResult]);
-
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="skyblue" />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <ScrollView>
-        <View style={styles.searchView}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Tìm kiếm"
-            onChangeText={(text) => (searchRef.current = text)}
-          />
-          <Pressable style={styles.searchButton} onPress={handleSearch}>
-            <Text style={{ fontWeight: "600", color: "gray" }}>Tìm</Text>
-          </Pressable>
-        </View>
-        <View style={styles.filterView}>
-          <Text style={styles.filterText}>Lọc theo: </Text>
-          <SelectDropdown
-            data={typeFilter}
-            onSelect={(selectedItem, index) => {
-              setFilter(selectedItem);
-            }}
-            defaultButtonText={typeFilter[0]}
-            buttonStyle={styles.filterButton}
-            buttonTextStyle={styles.filterButtonText}
-            dropdownStyle={styles.filterDropdown}
-            rowStyle={styles.filterRow}
-            renderDropdownIcon={() => (
-              <Feather name="chevron-down" size={20} color="gray" />
-            )}
-          />
-          <Text style={styles.filterText}> {filter}: </Text>
-          {filter === typeFilter[0] ? (
-            <SelectDropdown
-              data={sourceFilter}
-              onSelect={(selectedItem, index) => {
-                setSource(selectedItem);
-              }}
-              defaultButtonText={sourceFilter[0]}
-              buttonStyle={styles.filterButton}
-              buttonTextStyle={styles.filterButtonText}
-              dropdownStyle={styles.filterDropdown}
-              rowStyle={styles.filterRow}
-              renderDropdownIcon={() => (
-                <Feather name="chevron-down" size={20} color="gray" />
-              )}
-            />
-          ) : (
+        <View style={{ width: { width } }}>
+          <View style={styles.searchView}>
             <TextInput
-              style={styles.filterKeryword}
-              placeholder="Nhập từ khóa"
-              onChangeText={(text) => setKeyword(text)}
+              style={styles.searchInput}
+              placeholder="Tìm kiếm"
+              onChangeText={(text) => (searchRef.current = text)}
             />
-          )}
-          <Pressable onPress={getFilter}>
-            <Feather
-              name="filter"
-              size={25}
-              color="green"
-              style={styles.filterIcon}
-            />
-          </Pressable>
+            <Pressable
+              style={styles.searchButton}
+              onPress={() => setSearchPressed(true)}
+            >
+              <Text style={{ fontWeight: "600", color: "gray" }}>Tìm</Text>
+            </Pressable>
+          </View>
+          <View style={styles.searchView}>
+            <View style={styles.filterInput}>
+              <Text style={styles.filterText}>Lọc theo: </Text>
+              <View style={styles.filterInput}>
+                <SelectDropdown
+                  data={typeFilter}
+                  onSelect={(selectedItem, index) => {
+                    setFilter(selectedItem);
+                  }}
+                  defaultButtonText={typeFilter[0]}
+                  buttonStyle={styles.filterButton}
+                  buttonTextStyle={styles.filterButtonText}
+                  dropdownStyle={styles.filterDropdown}
+                  rowStyle={styles.filterRow}
+                  renderDropdownIcon={() => (
+                    <Feather name="chevron-down" size={20} color="gray" />
+                  )}
+                />
+                {filter === typeFilter[0] ? (
+                  <SelectDropdown
+                    data={sourceFilter}
+                    onSelect={(selectedItem, index) => {
+                      setSource(selectedItem);
+                    }}
+                    defaultButtonText={sourceFilter[0]}
+                    buttonStyle={[
+                      styles.filterButton,
+                      { width: 130, marginHorizontal: 10 },
+                    ]}
+                    buttonTextStyle={styles.filterButtonText}
+                    dropdownStyle={styles.filterDropdown}
+                    rowStyle={styles.filterRow}
+                    renderDropdownIcon={() => (
+                      <Feather name="chevron-down" size={20} color="gray" />
+                    )}
+                  />
+                ) : (
+                  <TextInput
+                    style={styles.filterKeryword}
+                    placeholder="Nhập từ khóa"
+                    onChangeText={(text) => setKeyword(text)}
+                  />
+                )}
+              </View>
+            </View>
+            <Pressable
+              onPress={() => setFilterPressed(true)}
+              style={styles.searchButton}
+            >
+              <Feather name="filter" size={25} color="gray" />
+              {/* <Text style={{ fontWeight: "600", color: "gray" }}>Lọc</Text> */}
+            </Pressable>
+          </View>
         </View>
         {searchResult && searchResult.length === 0 && (
           <View>
@@ -282,11 +314,18 @@ const News = ({ navigation, route }) => {
                 paginationStyleItemActive={{ width: 12, height: 12 }}
                 renderItem={({ item }) => (
                   <View style={styles.swiperItem}>
-                    <Image
-                      source={{ uri: item.urlToImage }}
-                      style={{ width: "100%", height: "100%" }}
-                      resizeMode="cover"
-                    />
+                    <Pressable
+                      style={styles.items}
+                      onPress={() =>
+                        navigation.navigate("Detail", { uri: item.url })
+                      }
+                    >
+                      <Image
+                        source={{ uri: item.urlToImage }}
+                        style={{ width: "100%", height: "100%" }}
+                        resizeMode="cover"
+                      />
+                    </Pressable>
                   </View>
                 )}
               />
@@ -416,16 +455,11 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     color: "gray",
   },
-  filterView: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 5,
-  },
   filterText: {
     fontSize: 15,
     fontWeight: "bold",
     color: "gray",
+    marginBottom: 10,
   },
   filterButton: {
     width: 120,
@@ -452,21 +486,18 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   filterKeryword: {
-    width: 120,
+    width: 130,
     height: 40,
-    backgroundColor: "#fff",
     borderRadius: 10,
-    paddingHorizontal: 5,
-    margin: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    marginLeft: 10,
     borderWidth: 0.5,
   },
-  filterIcon: {
-    borderWidth: 0.5,
-    borderRadius: 10,
-    padding: 5,
-    margin: 5,
-    borderColor: "green",
-    justifyContent: "center",
+  filterInput: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
   },
 });

@@ -3,8 +3,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import News from "./News";
 import Detail from "./Detail";
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation,route }) => {
   const Stack = createNativeStackNavigator();
+  const userLogin = route.params?.userLogin || {};
+  console.log("home" + userLogin);
 
 
   navigation.setOptions({
@@ -26,6 +28,7 @@ const Home = ({ navigation }) => {
         name="News"
         component={News}
         options={{ headerShown: false }}
+        initialParams={{ userLogin: route.params?.userLogin }}
       />
       <Stack.Screen
         name="Detail"

@@ -30,7 +30,7 @@ const HomeTab = ({ route }) => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="Tin Tức" component={Home} options={{tabBarHideOnKeyboard:true}} />
+      <Tab.Screen name="Tin Tức" component={Home} options={{tabBarHideOnKeyboard:true}} initialParams={{ userLogin: route.params?.userLogin }}/>
       <Tab.Screen name="Nổi Bật" component={Trending} />
       <Tab.Screen
         name="Thông Tin"
