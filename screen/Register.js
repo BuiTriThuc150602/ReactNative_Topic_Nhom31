@@ -48,7 +48,7 @@ const Register = ({ navigation }) => {
     return `${day}/${month}/${year}`;
   }
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (
       userName.trim() === "" ||
       dateOfBirth.trim() === "" ||
@@ -59,13 +59,11 @@ const Register = ({ navigation }) => {
       alert("Wrong information");
     } else {
       sendUserData();
-      alert("Sign up successfully");
-      navigation.navigate("Login");
     }
   };
   const sendUserData = async () => {
     console.log("dob", date);
-    console.log("New dob", new Date(date)); 
+    console.log("New dob", new Date(date));
     try {
       const response = await fetch(
         "https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users",
@@ -84,7 +82,9 @@ const Register = ({ navigation }) => {
         }
       );
       const data = await response.json();
-      console.log(data);
+      console.log("Success:", data);
+      alert("Sign up success");
+      navigation.goBack();
     } catch (error) {
       console.error("Error fetching data:", error);
     }

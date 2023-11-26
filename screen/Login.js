@@ -9,31 +9,33 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { CheckBox } from "react-native-elements";
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation,route }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [users, setUsers] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
+  const updateUsersData = async () => {
+    try {
+      const response = await fetch(
+        "https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users"
+      );
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // updateUsersData();
   useFocusEffect(
     useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const response = await fetch(
-            "https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users"
-          );
-          const data = await response.json();
-          setUsers(data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      };
-      fetchData();
+      updateUsersData();
     }, [navigation])
   );
 
@@ -85,10 +87,12 @@ const Login = ({ navigation }) => {
             checked={showPassword}
             onPress={() => setShowPassword(!showPassword)}
             containerStyle={styles.checkStyle}
-            textStyle={{ color: "white",fontStyle:"italic",fontWeight:"100" }}
+            textStyle={{
+              color: "white",
+              fontStyle: "italic",
+              fontWeight: "100",
+            }}
             checkedColor="green"
-
-          
           />
           <View style={styles.linksRow}>
             <Pressable onPress={() => navigation.navigate("SignUp")}>
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
     backgroundColor: "none",
   },
   input: {
-    backgroundColor: "none",
+    // backgroundColor: "none",
     marginBottom: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
