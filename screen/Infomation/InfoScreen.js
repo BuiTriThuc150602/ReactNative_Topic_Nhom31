@@ -69,7 +69,6 @@ const InfoScreen = ({ navigation, route }) => {
       <Stack.Screen
         name="Recently"
         component={RecentlyView}
-        options={{ headerShown: false }}
         initialParams={{ userLogin: route.params?.userLogin }}
       />
     </Stack.Navigator>

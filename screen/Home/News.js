@@ -34,14 +34,12 @@ const News = ({ navigation, route }) => {
   const { width, height } =
     Platform.OS === "web" ? window.screen : Dimensions.get("window");
 
-  const { likedNews, recenlyViewedNews } = route.params?.userLogin || {
-    likedNews: [],
-    recenlyViewedNews: [],
-  };
+  const userLogin = route.params?.userLogin || {};
 
-  const [likedNewsList, setLikedNewsList] = useState(likedNews);
-  const [recenlyViewedNewsList, setRecenlyViewedNewsList] =
-    useState(recenlyViewedNews);
+  const [likedNewsList, setLikedNewsList] = useState(userLogin.likedNews || []);
+  const [recenlyViewedNewsList, setRecenlyViewedNewsList] = useState(
+    userLogin.recenlyViewedNews || []
+  );
   const [like, setLike] = useState(false);
 
   const [result, setResult] = useState(null);
@@ -57,7 +55,7 @@ const News = ({ navigation, route }) => {
   const [source, setSource] = useState(sourceFilter[0]);
   const [keyword, setKeyword] = useState("");
   const [url, setUrl] = useState(
-    "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+    "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=a33101552b2d4a8790942eda3c504098"
   );
   const [filterPressed, setFilterPressed] = useState(false);
 
@@ -67,12 +65,12 @@ const News = ({ navigation, route }) => {
     const getTopTrending = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines?country=us&apiKey=33f7b18dad144a419a41f633c53c8701"
+          "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
         );
         const data = await response.json();
-        setTopTrending(data.articles);
+        setTopTrending(data.articles || []);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching data topTrending:", error);
       }
     };
     getTopTrending();
@@ -83,33 +81,33 @@ const News = ({ navigation, route }) => {
       if (filter === typeFilter[0]) {
         if (source === sourceFilter[0]) {
           setUrl(
-            "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+            "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&page=1&pageSize=20&apiKey=a33101552b2d4a8790942eda3c504098"
           );
         } else if (source === sourceFilter[1]) {
           setUrl(
-            "https://newsapi.org/v2/everything?domains=vnexpress.net&apiKey=33f7b18dad144a419a41f633c53c8701"
+            "https://newsapi.org/v2/everything?domains=vnexpress.net&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
           );
         } else if (source === sourceFilter[2]) {
           setUrl(
-            "https://newsapi.org/v2/everything?domains=tinhte.vn&apiKey=33f7b18dad144a419a41f633c53c8701"
+            "https://newsapi.org/v2/everything?domains=tinhte.vn&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
           );
         } else if (source === sourceFilter[3]) {
           setUrl(
-            "https://newsapi.org/v2/everything?domains=sputniknews.vn&apiKey=33f7b18dad144a419a41f633c53c8701"
+            "https://newsapi.org/v2/everything?domains=sputniknews.vn&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
           );
         } else if (source === sourceFilter[4]) {
           setUrl(
-            "https://newsapi.org/v2/everything?domains=voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+            "https://newsapi.org/v2/everything?domains=voatiengviet.com&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
           );
         }
       } else if (filter === typeFilter[1]) {
         if (keyword === "") {
           setUrl(
-            "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=33f7b18dad144a419a41f633c53c8701"
+            "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
           );
         } else {
           setUrl(
-            `https://newsapi.org/v2/everything?q=${keyword}&language=vi&apiKey=33f7b18dad144a419a41f633c53c8701`
+            `https://newsapi.org/v2/everything?q=${keyword}&language=vi&page=1&pageSize=20&apiKey=a33101552b2d4a8790942eda3c504098`
           );
         }
       }
@@ -199,7 +197,7 @@ const News = ({ navigation, route }) => {
           <Feather
             name="heart"
             size={25}
-            color={likedNewsList?.includes(item) ? "red" : "gray"}
+            color={likedNewsList.includes(item) ? "red" : "gray"}
             onPress={likePressed.bind(this, { item })}
           />
         </Pressable>
@@ -207,98 +205,69 @@ const News = ({ navigation, route }) => {
     );
   };
 
-  //Liked Handler
-  //************** */
-  const likedHandler = (item) => {
-    setLike(true);
-    if (!checkLiked(item)) {
-      setLikedNewsList([...likedNewsList, item]);
-    }
-  };
-  // dislikedHandler
-  //************** */
-  const dislikedHandler = (item) => {
-    setLike(false);
-    // remove item from likedNewsList
-    const newLikedNewsList = likedNewsList.filter(
-      (likedItem) => likedItem !== item
-    );
-    setLikedNewsList(newLikedNewsList);
-  };
-
   //Like Pressed
   //************** */
   const likePressed = ({ item }) => {
-    like ? dislikedHandler(item) : likedHandler(item);
-    // update likedNewsList in userLogin
-    const userLogin = route.params?.userLogin || {
-      likedNews: [],
-      recenlyViewedNews: [],
-    };
-    userLogin.likedNews = likedNewsList;
-    userLogin.recenlyViewedNews = recenlyViewedNewsList;
-    navigation.setParams({ userLogin });
-    // update likedNewsList to api server
-    const updateLikedNewsList = async () => {
-      try {
-        await fetch(
-          `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              likedNews: likedNewsList,
-            }),
-          }
-        );
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    updateLikedNewsList();
+    setLike(!like);
+    setLikedNewsList((prevLikedNewsList) => {
+      const newLikedNewsList = like
+        ? prevLikedNewsList.filter((likedItem) => likedItem !== item)
+        : [...prevLikedNewsList, item];
+      const updateLikedNewsList = async () => {
+        try {
+          await fetch(
+            `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                likedNews: newLikedNewsList,
+              }),
+            }
+          );
+        } catch (error) {
+          console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+      };
+      updateLikedNewsList();
+
+      return newLikedNewsList;
+    });
   };
 
   //Recenly Viewed Handler
   //************** */
   const recenlyViewedHandler = ({ item }) => {
-    if (recenlyViewedNewsList.length < 10) {
-      setRecenlyViewedNewsList([...recenlyViewedNewsList, item]);
-    } else {
-      setRecenlyViewedNewsList([
-        ...recenlyViewedNewsList.slice(1, 10),
-        item,
-      ]);
-    }
-    // update recenlyViewedNewsList in userLogin
-    const userLogin = route.params?.userLogin || {
-      likedNews: [],
-      recenlyViewedNews: [],
-    };
-    userLogin.likedNews = likedNewsList;
-    userLogin.recenlyViewedNews = recenlyViewedNewsList;
-    navigation.setParams({ userLogin });
-    // update recenlyViewedNewsList to api server
-    const updateRecenlyViewedNewsList = async () => {
-      try {
-        await fetch(
-          `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              recenlyViewedNews: recenlyViewedNewsList,
-            }),
-          }
-        );
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    updateRecenlyViewedNewsList();
+    setRecenlyViewedNewsList((prevRecenlyViewedNewsList) => {
+      const newRecenlyViewedNewsList =
+        recenlyViewedNewsList.length < 10
+          ? [...prevRecenlyViewedNewsList, item]
+          : [...prevRecenlyViewedNewsList.slice(1, 10), item];
+
+      const updateRecenlyViewedNewsList = async () => {
+        try {
+          await fetch(
+            `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                recenlyViewedNews: newRecenlyViewedNewsList,
+              }),
+            }
+          );
+        } catch (error) {
+          console.error("Error fetch data :", error);
+        }
+      };
+      updateRecenlyViewedNewsList();
+
+      return newRecenlyViewedNewsList;
+    });
   };
 
   function checkLiked(item) {
@@ -321,32 +290,49 @@ const News = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <View style={{ width: { width } }}>
-          <View style={styles.searchView}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Tìm kiếm"
-              onChangeText={(text) => (searchRef.current = text)}
-            />
-            <Pressable
-              style={styles.searchButton}
-              onPress={() => setSearchPressed(true)}
-            >
-              <Text style={{ fontWeight: "600", color: "gray" }}>Tìm</Text>
-            </Pressable>
-          </View>
-          <View style={styles.searchView}>
+      <View style={{ width: width }}>
+        <View style={styles.searchView}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Tìm kiếm"
+            onChangeText={(text) => (searchRef.current = text)}
+          />
+          <Pressable
+            style={styles.searchButton}
+            onPress={() => setSearchPressed(true)}
+          >
+            <Text style={{ fontWeight: "600", color: "gray" }}>Tìm</Text>
+          </Pressable>
+        </View>
+        <View style={styles.searchView}>
+          <View style={styles.filterInput}>
+            <Text style={styles.filterText}>Lọc theo: </Text>
             <View style={styles.filterInput}>
-              <Text style={styles.filterText}>Lọc theo: </Text>
-              <View style={styles.filterInput}>
+              <SelectDropdown
+                data={typeFilter}
+                onSelect={(selectedItem) => {
+                  setFilter(selectedItem);
+                }}
+                defaultButtonText={typeFilter[0]}
+                buttonStyle={styles.filterButton}
+                buttonTextStyle={styles.filterButtonText}
+                dropdownStyle={styles.filterDropdown}
+                rowStyle={styles.filterRow}
+                renderDropdownIcon={() => (
+                  <Feather name="chevron-down" size={20} color="gray" />
+                )}
+              />
+              {filter === typeFilter[0] ? (
                 <SelectDropdown
-                  data={typeFilter}
+                  data={sourceFilter}
                   onSelect={(selectedItem) => {
-                    setFilter(selectedItem);
+                    setSource(selectedItem);
                   }}
-                  defaultButtonText={typeFilter[0]}
-                  buttonStyle={styles.filterButton}
+                  defaultButtonText={sourceFilter[0]}
+                  buttonStyle={[
+                    styles.filterButton,
+                    { width: 130, marginHorizontal: 10 },
+                  ]}
                   buttonTextStyle={styles.filterButtonText}
                   dropdownStyle={styles.filterDropdown}
                   rowStyle={styles.filterRow}
@@ -354,56 +340,49 @@ const News = ({ navigation, route }) => {
                     <Feather name="chevron-down" size={20} color="gray" />
                   )}
                 />
-                {filter === typeFilter[0] ? (
-                  <SelectDropdown
-                    data={sourceFilter}
-                    onSelect={(selectedItem) => {
-                      setSource(selectedItem);
-                    }}
-                    defaultButtonText={sourceFilter[0]}
-                    buttonStyle={[
-                      styles.filterButton,
-                      { width: 130, marginHorizontal: 10 },
-                    ]}
-                    buttonTextStyle={styles.filterButtonText}
-                    dropdownStyle={styles.filterDropdown}
-                    rowStyle={styles.filterRow}
-                    renderDropdownIcon={() => (
-                      <Feather name="chevron-down" size={20} color="gray" />
-                    )}
-                  />
-                ) : (
-                  <TextInput
-                    style={styles.filterKeryword}
-                    placeholder="Nhập từ khóa"
-                    onChangeText={(text) => setKeyword(text)}
-                  />
-                )}
-              </View>
+              ) : (
+                <TextInput
+                  style={styles.filterKeryword}
+                  placeholder="Nhập từ khóa"
+                  onChangeText={(text) => setKeyword(text)}
+                />
+              )}
             </View>
-            <Pressable
-              onPress={() => setFilterPressed(true)}
-              style={styles.searchButton}
-            >
-              <Feather name="filter" size={25} color="gray" />
-            </Pressable>
           </View>
+          <Pressable
+            onPress={() => setFilterPressed(true)}
+            style={styles.searchButton}
+          >
+            <Feather name="filter" size={25} color="gray" />
+          </Pressable>
         </View>
+      </View>
+      <ScrollView style={{ width: width }}>
         {searchResult && searchResult.length === 0 && (
-          <View style={styles.container}>
+          <View style={{}}>
             <Text style={styles.titleTop}>
               Tin Tức Liên Quan Đến : {searchRef.current}
             </Text>
-            <Text
-              style={{ textAlign: "center", color: "red", fontWeight: "bold" }}
-            >
-              Không tìm thấy kết quả
-            </Text>
-            <Text
-              style={{ textAlign: "center", color: "red", fontWeight: "bold" }}
-            >
-              Vui lòng thử lại
-            </Text>
+            <View style={{ width: width, height: 150 }}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "red",
+                  fontWeight: "bold",
+                }}
+              >
+                Không tìm thấy kết quả
+              </Text>
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "red",
+                  fontWeight: "bold",
+                }}
+              >
+                Vui lòng thử lại
+              </Text>
+            </View>
             <Pressable
               style={styles.searchButton}
               onPress={() => setSearchResult(null)}
@@ -421,6 +400,18 @@ const News = ({ navigation, route }) => {
               data={searchResult || result?.articles || []}
               renderItem={renderItem}
             />
+            <Text style={styles.titleTop}>
+              Bạn đã xem hết tin tức về : {searchRef.current}
+            </Text>
+            <Pressable
+              style={[
+                styles.searchButton,
+                { marginBottom: 20, width: width / 2, alignSelf: "center" },
+              ]}
+              onPress={() => setSearchResult(null)}
+            >
+              <Text style={{ fontWeight: "600", color: "gray" }}>Quay lại</Text>
+            </Pressable>
           </SafeAreaView>
         )}
         {!searchResult && !searchPressed && (

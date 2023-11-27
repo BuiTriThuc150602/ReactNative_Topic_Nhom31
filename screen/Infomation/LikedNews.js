@@ -7,11 +7,15 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native";
 
 const LikedNews = ({ navigation, route }) => {
-  const userLogin = route.params?.userLogin || {};
-  const likedNews = userLogin.likedNews || [];
+  const [likedNews, setLikedNews] = useState([]);
+  const { userLogin } = route.params;
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     navigation.setOptions({
       headerTitle: "Tin Yêu Thích",
@@ -22,6 +26,25 @@ const LikedNews = ({ navigation, route }) => {
       },
     });
   }, [navigation]);
+
+  const getLikedNews = async () => {
+    try {
+      const response = await fetch(
+        `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`
+      );
+      const data = await response.json();
+      setLikedNews(data.likedNews);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getLikedNews();
+      setIsLoading(false);
+    }, [navigation, likedNews])
+  );
 
   const renderItem = ({ item }) => {
     return (
@@ -51,24 +74,33 @@ const LikedNews = ({ navigation, route }) => {
     return `${day}/${month}/${year}`;
   }
 
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="skyblue" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {likedNews.length === 0 && (
+      {likedNews && likedNews.length === 0 && (
         <View
           style={{
-            flex: 1,
+            width: "100%",
+            height: "100%",
             justifyContent: "center",
             alignItems: "center",
-            marginHorizontal: 20,
           }}
         >
           <Text style={{ fontSize: 20, fontWeight: "bold", color: "gray" }}>
-            Bạn chưa có tin tức nào được yêu thích
+            Bạn chưa có tin tức yêu thích nào !
           </Text>
         </View>
       )}
       <SafeAreaView style={{ width: "100%", height: "100%" }}>
-        <FlatList data={likedNews || []} renderItem={renderItem} />
+        <FlatList data={likedNews} renderItem={renderItem} />
       </SafeAreaView>
     </View>
   );

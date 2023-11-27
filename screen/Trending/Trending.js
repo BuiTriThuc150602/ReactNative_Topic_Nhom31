@@ -5,7 +5,6 @@ import {
   FlatList,
   Pressable,
   Image,
-  Linking,
   SafeAreaView,
   ActivityIndicator,
 } from "react-native";
@@ -32,12 +31,12 @@ const Trending = ({ navigation, route }) => {
   useEffect(() => {
     if (topTrending.length === 0) {
       fetch(
-        "https://newsapi.org/v2/top-headlines?country=us&apiKey=33f7b18dad144a419a41f633c53c8701"
+        "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
       )
         .then((response) => response.json())
         .then((data) => {
           navigation.setParams({ trending: data.articles });
-          setTopTrending(data.articles);
+          setTopTrending(data.articles || []);
         })
         .catch((error) => console.log(error));
     }
