@@ -16,12 +16,13 @@ import { CheckBox } from "react-native-elements/dist/checkbox/CheckBox";
 const Register = ({ navigation }) => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [dateOfBirth, setDateOfBirth] = React.useState("");
   const [userName, setUserName] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDate, setShowDate] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (event, selectedDate) => {
     if (event.type === "dismissed") {

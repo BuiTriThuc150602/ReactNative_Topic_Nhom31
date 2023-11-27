@@ -1,25 +1,51 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { Feather, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const Info = ({ navigation, route }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const userLogin = route.params?.userLogin;
-  const toggleShowPassword = () => {
-    setShowPassword((prev) => !prev);
-  };
+  // const userLogin = route.params?.userLogin;
+  const [userLogin, setUserLogin] = useState(route.params?.userLogin);
 
-  const logout = () => {
-    navigation.navigate("Login");
-  };
+  // Modal for change information
+  const [modalVisible, setModalVisible] = useState(false);
+  //Infomation of user for change
+  const [name, setName] = useState(userLogin.name);
+  const [email, setEmail] = useState(userLogin.email);
+  const [password, setPassword] = useState(userLogin.password);
 
-  function formatTime(time) {
-    const date = new Date(time);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${day}/${month}/${year}`;
-  }
+  const [dateOfBirth, setDateOfBirth] = useState(userLogin.dateOfBirth);
+  const [date, setDate] = useState(new Date());
+  const [showDate, setShowDate] = useState(false);
+  const [reloadUser, setReloadUser] = useState(false);
+
+  useEffect(() => {
+    const reload = async () => {
+      try {
+        const response = await fetch(
+          `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`
+        );
+        const data = await response.json();
+        console.log("Success:", data);
+        setUserLogin(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if (reloadUser) {
+      reload();
+      setReloadUser(false);
+    }
+  }, [reloadUser]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -41,6 +67,98 @@ const Info = ({ navigation, route }) => {
       ),
     });
   }, [navigation]);
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  //handle save information
+  const handleSave = () => {
+    //save information to api server
+    if (
+      name.trim() === "" ||
+      dateOfBirth.trim() === "" ||
+      email.trim() === "" ||
+      password.trim() === ""
+    ) {
+      alert("Wrong information");
+    } else {
+      sendUserData();
+    }
+  };
+  const sendUserData = async () => {
+    try {
+      const response = await fetch(
+        `https://6540e47345bedb25bfc2d34b.mockapi.io/react-lab-todos/users/${userLogin.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            dateOfBirth: new Date(date),
+            name: name,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log("Success:", data);
+      setReloadUser(true);
+      alert("Cập nhật thành công");
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+
+    closeModal();
+  };
+
+  const handleCancel = () => {
+    setName(userLogin.name);
+    setDateOfBirth(userLogin.dateOfBirth);
+    setEmail(userLogin.email);
+    setPassword(userLogin.password);
+    setShowPassword(false);
+    closeModal();
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const logout = () => {
+    navigation.navigate("Login");
+  };
+
+  const onChange = (event, selectedDate) => {
+    if (event.type === "dismissed") {
+      hideDatePicker();
+      return;
+    }
+    const currentDate = selectedDate || date;
+    setShowDate(false);
+    setDate(currentDate);
+    setDateOfBirth(formatTime(currentDate));
+  };
+  const showDatepicker = () => {
+    setShowDate(true);
+  };
+  const hideDatePicker = () => {
+    setShowDate(false);
+  };
+
+  function formatTime(time) {
+    const date = new Date(time);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${day}/${month}/${year}`;
+  }
 
   return (
     <View style={styles.container}>
@@ -89,12 +207,94 @@ const Info = ({ navigation, route }) => {
         </View>
 
         <View style={styles.formBtn}>
-          <Pressable style={styles.btn}>
+          <Pressable style={styles.btn} onPress={openModal}>
             <Feather name="edit" size={24} color="orange" />
             <Text style={styles.txt}>Chỉnh sửa</Text>
           </Pressable>
         </View>
       </View>
+
+      {/* Modal for change information */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Cập Nhật thông Tin</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter your name"
+              value={name}
+              onChangeText={(text) => setName(text)}
+            />
+            {showDate && (
+              <DateTimePicker
+                value={date}
+                mode={"date"}
+                display="spinner"
+                onChange={onChange}
+              />
+            )}
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter your date of birth"
+              value={dateOfBirth}
+              onChangeText={(text) => setDateOfBirth(text)}
+              onFocus={showDatepicker}
+            />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
+            <View
+              style={[
+                styles.modalInput,
+                {
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <TextInput
+                secureTextEntry={showPassword ? false : true}
+                style={[
+                  styles.modalInput,
+                  { width: "90%", borderWidth: 0, padding: 0, marginBottom: 0 },
+                ]}
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+              />
+              <Pressable onPress={toggleShowPassword}>
+                <Feather
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="black"
+                />
+              </Pressable>
+            </View>
+
+            <View style={styles.modalBtnView}>
+              <Pressable style={styles.modalBtn} onPress={handleCancel}>
+                <Feather name={"x"} size={20} color="red" />
+                <Text style={[styles.modalBtnText, { color: "red" }]}>Hủy</Text>
+              </Pressable>
+              <Pressable style={styles.modalBtn} onPress={handleSave}>
+                <Feather name={"save"} size={20} color="green" />
+                <Text style={[styles.modalBtnText, { color: "green" }]}>
+                  Lưu
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -156,5 +356,53 @@ const styles = StyleSheet.create({
   formBtn: {
     alignItems: "center",
     marginTop: 20,
+  },
+
+  // Modal for change information
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,.5)",
+  },
+  modalView: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalTitle: {
+    fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "grey",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  modalBtnView: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalBtn: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "skyblue",
+    width: "40%",
+    alignItems: "center",
+  },
+  modalBtnText: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  txt: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

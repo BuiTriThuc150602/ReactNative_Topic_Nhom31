@@ -7,11 +7,11 @@ import {
   Image,
   Linking,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Trending = ({ navigation, route }) => {
-  const topTrending = route.params?.trending || [];
   navigation.setOptions({
     headerTitle: "Nổi Bật Hôm Nay",
     headerStyle: {
@@ -24,6 +24,39 @@ const Trending = ({ navigation, route }) => {
       fontSize: 20,
     },
   });
+
+  const [topTrending, setTopTrending] = useState(route.params?.trending || []);
+  const [isLoading, setIsLoading] = useState(true);
+
+  //fetch data if not have data
+  useEffect(() => {
+    if (topTrending.length === 0) {
+      fetch(
+        "https://newsapi.org/v2/top-headlines?country=us&apiKey=33f7b18dad144a419a41f633c53c8701"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          navigation.setParams({ trending: data.articles });
+          setTopTrending(data.articles);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (topTrending.length !== 0 && topTrending) {
+      setIsLoading(false);
+    }
+  }, [topTrending]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="skyblue" />
+      </View>
+    );
+  }
+
   const renderItem = ({ item }) => {
     return (
       <View style={styles.container}>
@@ -54,8 +87,8 @@ const Trending = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={{width: '100%',height: '100%',}}>
-      <Text style={styles.titleTop}>Tin nổi bật hôm nay</Text>
+      <SafeAreaView style={{ width: "100%", height: "100%" }}>
+        <Text style={styles.titleTop}>Tin nổi bật hôm nay</Text>
         <FlatList data={topTrending || []} renderItem={renderItem} />
       </SafeAreaView>
     </View>
