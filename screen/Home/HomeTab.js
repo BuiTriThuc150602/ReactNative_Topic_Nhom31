@@ -2,8 +2,8 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Home from "./Home";
-import Info from "./Info";
-import Trending from "./Trending";
+import Trending from "../Trending/Trending";
+import InfoScreen from "../Infomation/InfoScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -34,8 +34,9 @@ const HomeTab = ({ route }) => {
       <Tab.Screen name="Nổi Bật" component={Trending} />
       <Tab.Screen
         name="Thông Tin"
-        component={Info}
+        component={InfoScreen}
         initialParams={{ userLogin: route.params?.userLogin }}
+        headerShown={false}
       />
     </Tab.Navigator>
   );

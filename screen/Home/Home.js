@@ -6,7 +6,6 @@ import Detail from "./Detail";
 const Home = ({ navigation,route }) => {
   const Stack = createNativeStackNavigator();
   const userLogin = route.params?.userLogin || {};
-  console.log("home" + userLogin);
 
 
   navigation.setOptions({

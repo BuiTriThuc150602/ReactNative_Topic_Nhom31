@@ -19,7 +19,7 @@ const Register = ({ navigation }) => {
   const [userName, setUserName] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDate, setShowDate] = useState(false);
@@ -96,7 +96,7 @@ const Register = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../img/background_login.png")}
+        source={require("../../img/background_login.png")}
         style={styles.background}
         resizeMode="cover"
       >
@@ -178,17 +178,17 @@ const Register = ({ navigation }) => {
           </Text>
           <View style={styles.moreLogin}>
             <Image
-              source={require("../img/gg-logo.png")}
+              source={require("../../img/gg-logo.png")}
               resizeMode="contain"
               style={styles.logo_icons}
             />
             <Image
-              source={require("../img/fb-logo.png")}
+              source={require("../../img/fb-logo.png")}
               resizeMode="contain"
               style={styles.logo_icons}
             />
             <Image
-              source={require("../img/phone-logo.png")}
+              source={require("../../img/phone-logo.png")}
               resizeMode="contain"
               style={styles.logo_icons}
             />

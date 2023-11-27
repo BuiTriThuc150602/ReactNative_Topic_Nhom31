@@ -7,12 +7,11 @@ import {
   View,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { Feather, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const Info = ({ navigation, route }) => {
   const [showPassword, setShowPassword] = useState(false);
-  // const userLogin = route.params?.userLogin;
   const [userLogin, setUserLogin] = useState(route.params?.userLogin);
 
   // Modal for change information
@@ -22,10 +21,13 @@ const Info = ({ navigation, route }) => {
   const [email, setEmail] = useState(userLogin.email);
   const [password, setPassword] = useState(userLogin.password);
 
-  const [dateOfBirth, setDateOfBirth] = useState(userLogin.dateOfBirth);
+  const [dateOfBirth, setDateOfBirth] = useState(
+    new Date(userLogin.dateOfBirth)
+  );
   const [date, setDate] = useState(new Date());
   const [showDate, setShowDate] = useState(false);
   const [reloadUser, setReloadUser] = useState(false);
+  const [dateToShow, setDateToShow] = useState(formatTime(dateOfBirth));
 
   useEffect(() => {
     const reload = async () => {
@@ -47,27 +49,6 @@ const Info = ({ navigation, route }) => {
     }
   }, [reloadUser]);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerTitle: "Thông tin cá nhân",
-      headerStyle: {
-        backgroundColor: "skyblue",
-        shadowColor: "#fff",
-      },
-      headerTintColor: "#fff",
-      headerTitleStyle: {
-        fontWeight: "bold",
-        fontSize: 20,
-      },
-      headerRight: () => (
-        <Pressable style={styles.btnLogout} onPress={logout}>
-          <MaterialIcons name="logout" size={20} color="red" />
-          <Text style={styles.txtLogout}>Đăng Xuất</Text>
-        </Pressable>
-      ),
-    });
-  }, [navigation]);
-
   const openModal = () => {
     setModalVisible(true);
   };
@@ -76,13 +57,19 @@ const Info = ({ navigation, route }) => {
     setModalVisible(false);
   };
 
+  //check email valid
+  const validateEmail = (email) => {
+    var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return re.test(email);
+  };
+
   //handle save information
   const handleSave = () => {
     //save information to api server
     if (
       name.trim() === "" ||
-      dateOfBirth.trim() === "" ||
-      email.trim() === "" ||
+      dateOfBirth.toString().trim() === "" ||
+      !validateEmail(email) ||
       password.trim() === ""
     ) {
       alert("Wrong information");
@@ -131,10 +118,6 @@ const Info = ({ navigation, route }) => {
     setShowPassword((prev) => !prev);
   };
 
-  const logout = () => {
-    navigation.navigate("Login");
-  };
-
   const onChange = (event, selectedDate) => {
     if (event.type === "dismissed") {
       hideDatePicker();
@@ -143,7 +126,8 @@ const Info = ({ navigation, route }) => {
     const currentDate = selectedDate || date;
     setShowDate(false);
     setDate(currentDate);
-    setDateOfBirth(formatTime(currentDate));
+    setDateOfBirth(currentDate);
+    setDateToShow(formatTime(currentDate));
   };
   const showDatepicker = () => {
     setShowDate(true);
@@ -164,11 +148,11 @@ const Info = ({ navigation, route }) => {
     <View style={styles.container}>
       <Ionicons name="person-circle-outline" size={150} color="grey" />
       <View style={styles.btnView}>
-        <Pressable style={styles.btn}>
+        <Pressable style={styles.btn} onPress={()=>navigation.navigate("Recently",{userlogin : userLogin})}>
           <Feather name="clock" size={24} color="green" />
           <Text style={styles.txt}>Đọc Gần Đây</Text>
         </Pressable>
-        <Pressable style={styles.btn}>
+        <Pressable style={styles.btn} onPress={()=>navigation.navigate("Liked")}>
           <Feather name="heart" size={24} color="red" />
           <Text style={styles.txt}>Đã Thích</Text>
         </Pressable>
@@ -181,7 +165,7 @@ const Info = ({ navigation, route }) => {
 
         <View style={styles.form}>
           <Text style={styles.txtTitle}>Ngày Sinh:</Text>
-          <Text style={styles.txt}>{formatTime(userLogin.dateOfBirth)}</Text>
+          <Text style={styles.txt}>{dateToShow}</Text>
         </View>
 
         <View style={styles.form}>
@@ -232,7 +216,7 @@ const Info = ({ navigation, route }) => {
             />
             {showDate && (
               <DateTimePicker
-                value={date}
+                value={dateOfBirth}
                 mode={"date"}
                 display="spinner"
                 onChange={onChange}
@@ -241,7 +225,7 @@ const Info = ({ navigation, route }) => {
             <TextInput
               style={styles.modalInput}
               placeholder="Enter your date of birth"
-              value={dateOfBirth}
+              value={dateToShow}
               onChangeText={(text) => setDateOfBirth(text)}
               onFocus={showDatepicker}
             />
@@ -306,19 +290,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingVertical: 20,
-  },
-  btnLogout: {
-    padding: 10,
-    marginRight: 10,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "red",
-    flexDirection: "row",
-  },
-  txtLogout: {
-    color: "red",
-    fontWeight: "bold",
-    marginLeft: 5,
   },
   btnView: {
     flexDirection: "row",

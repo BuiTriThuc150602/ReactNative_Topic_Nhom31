@@ -55,7 +55,7 @@ const Login = ({ navigation,route }) => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../img/background_login.png")}
+        source={require("../../img/background_login.png")}
         style={styles.background}
         resizeMode="cover"
       >
@@ -110,17 +110,17 @@ const Login = ({ navigation,route }) => {
           </Text>
           <View style={styles.moreLogin}>
             <Image
-              source={require("../img/gg-logo.png")}
+              source={require("../../img/gg-logo.png")}
               resizeMode="contain"
               style={styles.logo_icons}
             />
             <Image
-              source={require("../img/fb-logo.png")}
+              source={require("../../img/fb-logo.png")}
               resizeMode="contain"
               style={styles.logo_icons}
             />
             <Image
-              source={require("../img/phone-logo.png")}
+              source={require("../../img/phone-logo.png")}
               resizeMode="contain"
               style={styles.logo_icons}
             />
