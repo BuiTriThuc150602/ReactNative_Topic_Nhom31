@@ -41,19 +41,20 @@ const News = ({ navigation, route }) => {
     userLogin.recenlyViewedNews || []
   );
   const [like, setLike] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearch, setIsSearch] = useState(false);
 
   const [result, setResult] = useState(null);
   const searchRef = useRef("");
   const [searchPressed, setSearchPressed] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [topTrending, setTopTrending] = useState([]);
 
   const typeFilter = ["Nguồn", "Từ khóa"];
   const sourceFilter = ["Tất cả", "VNExpress", "Tinh Tế", "Sputnik", "VOA"];
   const [filter, setFilter] = useState(typeFilter[0]);
   const [source, setSource] = useState(sourceFilter[0]);
-  const [keyword, setKeyword] = useState("");
+  const keyword = useRef("");
   const [url, setUrl] = useState(
     "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&apiKey=a33101552b2d4a8790942eda3c504098"
   );
@@ -101,18 +102,19 @@ const News = ({ navigation, route }) => {
           );
         }
       } else if (filter === typeFilter[1]) {
-        if (keyword === "") {
+        if (keyword.current === "") {
           setUrl(
             "https://newsapi.org/v2/everything?domains=vnexpress.net,tinhte.vn,sputniknews.vn,voatiengviet.com&page=1&pageSize=10&apiKey=a33101552b2d4a8790942eda3c504098"
           );
         } else {
           setUrl(
-            `https://newsapi.org/v2/everything?q=${keyword}&language=vi&page=1&pageSize=20&apiKey=a33101552b2d4a8790942eda3c504098`
+            `https://newsapi.org/v2/everything?q=${keyword.current}&language=vi&page=1&pageSize=20&apiKey=a33101552b2d4a8790942eda3c504098`
           );
         }
       }
     };
     if (filterPressed) {
+      setIsSearch(true);
       setFilterPressed(false);
       getFilter();
     }
@@ -150,6 +152,7 @@ const News = ({ navigation, route }) => {
     };
 
     if (searchPressed) {
+      setIsSearch(true);
       handleSearch();
       setSearchPressed(false);
     }
@@ -160,6 +163,7 @@ const News = ({ navigation, route }) => {
   useEffect(() => {
     if (result !== null) {
       setIsLoading(false);
+      setIsSearch(false);
     }
   }, [result, searchResult]);
 
@@ -344,7 +348,7 @@ const News = ({ navigation, route }) => {
                 <TextInput
                   style={styles.filterKeryword}
                   placeholder="Nhập từ khóa"
-                  onChangeText={(text) => setKeyword(text)}
+                  onChangeText={(text) => (keyword.current = text)}
                 />
               )}
             </View>
@@ -358,6 +362,11 @@ const News = ({ navigation, route }) => {
         </View>
       </View>
       <ScrollView style={{ width: width }}>
+        {isSearch && (
+          <View style={{ width: width, height: 150 }}>
+            <ActivityIndicator size="large" color="skyblue" />
+          </View>
+        )}
         {searchResult && searchResult.length === 0 && (
           <View style={{}}>
             <Text style={styles.titleTop}>
